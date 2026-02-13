@@ -1,5 +1,9 @@
-import { ComponentExample } from "@/components/component-example";
+import { EventStormingBoard } from "@/components/event-storming/event-storming-board";
 
 export default function Page() {
-return <ComponentExample />;
+  return (
+    <div className="w-screen h-screen">
+      <EventStormingBoard />
+    </div>
+  );
 }
