@@ -3,7 +3,7 @@
 import { cn } from '@/lib/utils';
 import { Node, NodeProps, useReactFlow } from '@xyflow/react';
 import { useState } from 'react';
-import { ContentEditable } from './content-editable';
+import { ContentEditable } from '../base/content-editable';
 import {
   StickyNoteType,
   StickyNoteBgClassName,
@@ -54,8 +54,8 @@ export function StickyNoteNode(props: NodeProps<StickyNoteFlowNode>) {
         onEditEnd={() => setIsEditing(false)}
       />
       <div
-        className={cn('absolute top-0 left-0 w-full h-full rounded-md pointer-events-none', {
-          'outline-1 outline-black/50': selected,
+        className={cn('absolute top-0 left-0 w-full h-full rounded-md', {
+          'outline-1 outline-black/50 pointer-events-none': selected,
         })}
       />
     </div>

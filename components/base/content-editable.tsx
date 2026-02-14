@@ -27,6 +27,7 @@ export type ContentEditableProps = {
 
 export const ContentEditable = forwardRef<HTMLDivElement, ContentEditableProps>(function ContentEditable(props, ref) {
   const editorRef = useRef<HTMLDivElement>(null);
+  const [isEditing, setIsEditing] = useState(false);
   const [editingContent, setEditingContent] = useState(props.content);
 
   useImperativeHandle(ref, () => editorRef.current!);
@@ -42,21 +43,16 @@ export const ContentEditable = forwardRef<HTMLDivElement, ContentEditableProps>(
       editorRef.current.innerHTML = '&nbsp;';
       selectAllContent(editorRef.current);
     }
+    setIsEditing(true);
     props.onEditStart?.();
   };
 
   const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
     const text = e.currentTarget.innerText ?? '';
 
-    if (
-      editingContent.trim() === '' ||
-      text.trim() === ''
-    ) {
+    if (editingContent.trim() === '' || text.trim() === '') {
       const nativeEvent = e.nativeEvent as InputEvent;
-      if (
-        nativeEvent.inputType === 'deleteContentBackward' ||
-        nativeEvent.inputType === 'deleteContentForward'
-      ) {
+      if (nativeEvent.inputType === 'deleteContentBackward' || nativeEvent.inputType === 'deleteContentForward') {
         if (!editorRef.current) return;
         editorRef.current.innerHTML = '&nbsp;';
         selectAllContent(editorRef.current);
@@ -72,8 +68,13 @@ export const ContentEditable = forwardRef<HTMLDivElement, ContentEditableProps>(
   };
 
   const handleBlur = () => {
+    setIsEditing(false);
     props.onEditEnd?.();
     props.onContentChange?.(editingContent);
+
+    if (editingContent.trim() === '' && editorRef.current) {
+      editorRef.current.innerHTML = '';
+    }
   };
 
   return (
@@ -84,8 +85,11 @@ export const ContentEditable = forwardRef<HTMLDivElement, ContentEditableProps>(
       suppressContentEditableWarning
       className={cn(
         'relative isolate cursor-text',
-        '[&:after]:content-(--placeholder) [&:after]:absolute [&:after]:block [&:after]:top-0 [&:after]:left-0 [&:after]:w-full [&:after]:h-full [&:after]:opacity-50 [&:after]:whitespace-pre-wrap [&:after]:-z-10',
-        props.className
+        '[&:after]:content-(--placeholder) [&:after]:opacity-50 [&:after]:whitespace-pre-wrap',
+        editingContent !== '' || isEditing
+          ? '[&:after]:absolute [&:after]:block [&:after]:top-0 [&:after]:left-0 [&:after]:w-full [&:after]:h-full [&:after]:-z-10'
+          : '',
+        props.className,
       )}
       style={
         {

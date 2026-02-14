@@ -97,9 +97,9 @@ export function useBoardShortcuts(options: {
 
       // Ctrl/Cmd+D — Duplicate
       if (isMod && event.key === 'd') {
-        event.preventDefault();
         const selected = getNodes().filter((n) => n.selected);
         if (selected.length === 0) return;
+        event.preventDefault();
 
         takeSnapshot();
         const newNodes = selected.map((n) => ({

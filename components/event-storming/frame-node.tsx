@@ -3,7 +3,7 @@
 import { cn } from '@/lib/utils';
 import { Node, NodeProps, NodeResizer, useReactFlow } from '@xyflow/react';
 import { useState } from 'react';
-import { ContentEditable } from './content-editable';
+import { ContentEditable } from '../base/content-editable';
 
 export type FrameNodeData = {
   text: string;
@@ -17,11 +17,7 @@ export function FrameNode(props: NodeProps<FrameFlowNode>) {
   const [isEditing, setIsEditing] = useState(false);
 
   const handleContentChange = (text: string) => {
-    setNodes((nodes) =>
-      nodes.map((node) =>
-        node.id === id ? { ...node, data: { ...node.data, text } } : node
-      )
-    );
+    setNodes((nodes) => nodes.map((node) => (node.id === id ? { ...node, data: { ...node.data, text } } : node)));
   };
 
   return (
@@ -38,13 +34,13 @@ export function FrameNode(props: NodeProps<FrameFlowNode>) {
         }}
       />
       <div className="w-full h-full border-2 border-black -z-10 pointer-events-none">
-        <div className="p-2 absolute top-1 left-1 min-w-20 pointer-events-auto">
+        <div className="p-2 absolute top-1 left-1 pointer-events-auto">
           <ContentEditable
             className={cn(
-              'px-2 py-1 text-sm font-semibold text-black rounded',
+              'min-w-14 text-sm font-semibold text-black rounded',
               'cursor-text hover:bg-black/10',
               'focus-visible:outline-1 focus-visible:outline-black',
-              isEditing && 'nowheel nodrag'
+              isEditing && 'nowheel nodrag',
             )}
             content={data.text || ''}
             onContentChange={handleContentChange}
