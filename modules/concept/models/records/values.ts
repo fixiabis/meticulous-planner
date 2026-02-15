@@ -1,5 +1,6 @@
-export type ProjectId = string & { _type: 'project-id' };
-export const ProjectId = (value: string) => value as ProjectId;
+import { ProjectId } from '@/modules/project/models/records/values';
+
+export { ProjectId };
 
 export type TermId = string & { _type: 'term-id' };
 export const TermId = (value: string) => value as TermId;

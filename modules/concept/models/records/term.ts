@@ -6,7 +6,7 @@ import { TermAdded, TermEdited, TermRemoved } from '../messages/events';
 
 export type TermProps = {
   readonly id: TermId;
-  readonly events: Base_Event[];
+  readonly domainEvents: Base_Event[];
   readonly projectId: ProjectId;
   readonly type: TermType;
   readonly language: string;
@@ -18,11 +18,13 @@ export type TermProps = {
 
 export type BaseTermProps = Pick<TermProps, 'id' | 'projectId' | 'type' | 'language'> & Partial<TermProps>;
 
-export type EditTermProps = Partial<Omit<TermProps, 'id' | 'projectId' | 'type' | 'language'>>;
+export type WithTermProps = Partial<Omit<TermProps, 'id' | 'projectId' | 'type' | 'language'>>;
 
-export class Term {
+export type EditTermProps = Omit<WithTermProps, 'domainEvents'>;
+
+export class Term implements TermProps {
   readonly id: TermId;
-  readonly events: Base_Event[];
+  readonly domainEvents: Base_Event[];
   readonly projectId: ProjectId;
   readonly type: TermType;
   readonly language: string;
@@ -33,7 +35,7 @@ export class Term {
 
   constructor(props: BaseTermProps) {
     this.id = props.id;
-    this.events = props.events ?? [];
+    this.domainEvents = props.domainEvents ?? [];
     this.projectId = props.projectId;
     this.type = props.type;
     this.language = props.language;
@@ -49,21 +51,28 @@ export class Term {
 
   added(props: BaseTermProps): Term {
     return this.withProps({
-      events: [...this.events, new TermAdded(this.projectId, this.id, props)],
+      domainEvents: [...this.domainEvents, new TermAdded(this.projectId, this.id, props)],
     });
   }
 
   edit(props: EditTermProps) {
-    return this.withProps({ ...props, events: [...this.events, new TermEdited(this.projectId, this.id, props)] });
+    return this.withProps({
+      ...props,
+      domainEvents: [...this.domainEvents, new TermEdited(this.projectId, this.id, props)],
+    });
   }
 
   removed() {
     return this.withProps({
-      events: [...this.events, new TermRemoved(this.projectId, this.id)],
+      domainEvents: [...this.domainEvents, new TermRemoved(this.projectId, this.id)],
     });
   }
 
-  withProps(props: EditTermProps) {
+  clearDomainEvents() {
+    return this.withProps({ domainEvents: [] });
+  }
+
+  private withProps(props: WithTermProps) {
     return new Term({
       ...this,
       ...props,

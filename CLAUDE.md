@@ -44,8 +44,9 @@ integrations/    — Infrastructure implementations (implements store, etc.)
 - **Props derivation**: use `Pick` / `Omit` / `Partial` composition, not redefinition
   ```typescript
   export type BaseTermProps = Pick<TermProps, 'id' | 'projectId' | 'type' | 'language'> & Partial<TermProps>;
-  export type EditTermProps = Partial<Omit<TermProps, 'id' | 'projectId' | 'type' | 'language'>>;
+  export type WithTermProps = Partial<Omit<TermProps, 'id' | 'projectId' | 'type' | 'language'>>;
   ```
+- **Props naming**: `BaseXXProps` for creation, `WithXXProps` for `withProps()` / mutation methods
 - **Branded types**: type + same-name factory function
   ```typescript
   export type ProjectId = string & { _type: 'project-id' };
@@ -99,9 +100,42 @@ export class Term {
     });
   }
 
-  withProps(props: EditTermProps) {
+  private withProps(props: WithTermProps) {
     return new Term({ ...this, ...props, id: this.id });
   }
+}
+```
+
+### Aggregate Root — Child Mutation Pattern
+
+When multiple methods mutate the same child type, extract a `withEditXX` helper:
+
+```typescript
+editStickyNoteText(stickyNoteId: StickyNoteId, text: string) {
+  return this.withEditStickyNote(stickyNoteId, (stickyNote) => stickyNote.editText(text));
+}
+
+moveStickyNote(stickyNoteId: StickyNoteId, position: Position) {
+  return this.withEditStickyNote(stickyNoteId, (stickyNote) => stickyNote.move(position));
+}
+
+withEditStickyNote(stickyNoteId: StickyNoteId, edit: (stickyNote: StickyNote) => StickyNote) {
+  const stickyNote = this.stickyNotes.find((sn) => sn.id === stickyNoteId);
+
+  if (!stickyNote) {
+    return this;
+  }
+
+  const editedStickyNote = edit(stickyNote.clearDomainEvents());
+
+  const stickyNotes = this.stickyNotes.map((sn) => {
+    return sn.id !== stickyNoteId ? sn : editedStickyNote.clearDomainEvents();
+  });
+
+  return this.withProps({
+    stickyNotes,
+    domainEvents: [...this.domainEvents, ...editedStickyNote.domainEvents],
+  });
 }
 ```
 

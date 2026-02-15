@@ -31,24 +31,24 @@ export class ConceptService implements ConceptGateway {
       ...command.termProps,
       id: this.termStore.generateId(),
     })
-      .withProps({ events: [] })
+      .clearDomainEvents()
       .added(command.termProps);
 
     this.termStore.put(addedTerm);
 
-    return addedTerm.events;
+    return addedTerm.domainEvents;
   }
 
   async editTerm(command: EditTermCommand) {
-    const editedTerm = this.termStore.getById(command.termId).withProps({ events: [] }).edit(command.termProps);
+    const editedTerm = this.termStore.getById(command.termId).clearDomainEvents().edit(command.termProps);
     this.termStore.put(editedTerm);
-    return editedTerm.events;
+    return editedTerm.domainEvents;
   }
 
   async removeTerm(command: RemoveTermCommand) {
-    const removedTerm = this.termStore.getById(command.termId).withProps({ events: [] }).removed();
+    const removedTerm = this.termStore.getById(command.termId).clearDomainEvents().removed();
     this.termStore.removeById(removedTerm.id);
-    return removedTerm.events;
+    return removedTerm.domainEvents;
   }
 
   async addPolicy(command: AddPolicyCommand) {
@@ -56,23 +56,23 @@ export class ConceptService implements ConceptGateway {
       ...command.policyProps,
       id: this.policyStore.generateId(),
     })
-      .withProps({ events: [] })
+      .clearDomainEvents()
       .added(command.policyProps);
 
     this.policyStore.put(addedPolicy);
 
-    return addedPolicy.events;
+    return addedPolicy.domainEvents;
   }
 
   async editPolicy(command: EditPolicyCommand) {
-    const editedPolicy = this.policyStore.getById(command.policyId).withProps({ events: [] }).edit(command.policyProps);
+    const editedPolicy = this.policyStore.getById(command.policyId).clearDomainEvents().edit(command.policyProps);
     this.policyStore.put(editedPolicy);
-    return editedPolicy.events;
+    return editedPolicy.domainEvents;
   }
 
   async removePolicy(command: RemovePolicyCommand) {
-    const removedPolicy = this.policyStore.getById(command.policyId).withProps({ events: [] }).removed();
+    const removedPolicy = this.policyStore.getById(command.policyId).clearDomainEvents().removed();
     this.policyStore.removeById(removedPolicy.id);
-    return removedPolicy.events;
+    return removedPolicy.domainEvents;
   }
 }

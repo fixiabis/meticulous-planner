@@ -6,7 +6,7 @@ import { PolicyAdded, PolicyEdited, PolicyRemoved } from '../messages/events';
 
 export type PolicyProps = {
   readonly id: PolicyId;
-  readonly events: Base_Event[];
+  readonly domainEvents: Base_Event[];
   readonly projectId: ProjectId;
   readonly eventTermId: TermId | null;
   readonly actorTermId: TermId | null;
@@ -15,11 +15,13 @@ export type PolicyProps = {
 
 export type BasePolicyProps = Pick<PolicyProps, 'id' | 'projectId'> & Partial<PolicyProps>;
 
-export type EditPolicyProps = Partial<Omit<PolicyProps, 'id' | 'projectId'>>;
+export type WithPolicyProps = Partial<Omit<PolicyProps, 'id' | 'projectId'>>;
 
-export class Policy {
+export type EditPolicyProps = Omit<WithPolicyProps, 'domainEvents'>;
+
+export class Policy implements PolicyProps {
   readonly id: PolicyId;
-  readonly events: Base_Event[];
+  readonly domainEvents: Base_Event[];
   readonly projectId: ProjectId;
   readonly eventTermId: TermId | null;
   readonly actorTermId: TermId | null;
@@ -27,7 +29,7 @@ export class Policy {
 
   constructor(props: BasePolicyProps) {
     this.id = props.id;
-    this.events = props.events ?? [];
+    this.domainEvents = props.domainEvents ?? [];
     this.projectId = props.projectId;
     this.eventTermId = props.eventTermId ?? null;
     this.actorTermId = props.actorTermId ?? null;
@@ -35,18 +37,29 @@ export class Policy {
   }
 
   added(props: BasePolicyProps) {
-    return this.withProps({ events: [...this.events, new PolicyAdded(this.projectId, this.id, props)] });
+    return this.withProps({
+      domainEvents: [...this.domainEvents, new PolicyAdded(this.projectId, this.id, props)],
+    });
   }
 
   edit(props: EditPolicyProps) {
-    return this.withProps({ ...props, events: [...this.events, new PolicyEdited(this.projectId, this.id, props)] });
+    return this.withProps({
+      ...props,
+      domainEvents: [...this.domainEvents, new PolicyEdited(this.projectId, this.id, props)],
+    });
   }
 
   removed() {
-    return this.withProps({ events: [...this.events, new PolicyRemoved(this.projectId, this.id)] });
+    return this.withProps({
+      domainEvents: [...this.domainEvents, new PolicyRemoved(this.projectId, this.id)],
+    });
   }
 
-  withProps(props: EditPolicyProps) {
+  clearDomainEvents() {
+    return this.withProps({ domainEvents: [] });
+  }
+
+  private withProps(props: WithPolicyProps) {
     return new Policy({
       ...this,
       ...props,

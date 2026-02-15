@@ -17,5 +17,5 @@ export interface Store<T extends { id: string }, TId extends string = T['id']> {
   removeAllByQuery(query: (value: T) => boolean): void;
 
   generateId(): TId;
-  generateId<TGeneratedId extends string>(type: TGeneratedId): TGeneratedId;
+  generateId<TGeneratedId extends string>(type: string): TGeneratedId;
 }
