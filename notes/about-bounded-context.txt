@@ -1,0 +1,8 @@
+board 的所有變化都會同步現在有的 term
+model 也是，我們會在專案中，一個 subdomain 中建立新的 models
+
+概念釐清
+domain 是整體, project = domain, domain = system
+domain 有多個 subdomain 和一個 core domain
+subdomain 自身有 bounded-context
+subdomain 之間有 bounded-context
