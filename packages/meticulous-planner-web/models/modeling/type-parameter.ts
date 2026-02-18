@@ -41,7 +41,7 @@ export class TypeParameter implements TypeParameterProps {
     });
   }
 
-  editConstraintType(constraintType: TypeReference) {
+  editConstraintType(constraintType: TypeReference | null) {
     return this.withProps({ constraintType });
   }
 }

@@ -1,14 +1,13 @@
 import { useModel } from '@/hooks/modeling/use-model';
 import { cn } from '@/lib/utils';
 import { TypeReference } from '@/models/modeling/type-reference';
-import { Language, ModelId, ModuleId } from '@/models/modeling/values';
+import { Language, ModelId } from '@/models/modeling/values';
 import { Fragment } from 'react';
 import { TypeReferenceSelector } from './type-reference-selector';
 
 export type TypeReferenceInputProps = {
   className?: string;
-  modelId: ModelId | null;
-  moduleId: ModuleId | null;
+  typeParameterModelId: ModelId | null;
   language: Language;
   value: TypeReference | null;
   onChange?: (value: TypeReference | null) => void;
@@ -21,8 +20,7 @@ export function TypeReferenceInput(props: TypeReferenceInputProps) {
     <span className={cn('', props.className)}>
       <TypeReferenceSelector
         value={props.value || null}
-        moduleId={props.moduleId}
-        modelId={props.modelId}
+        modelId={props.typeParameterModelId}
         language={props.language}
         onChange={props.onChange}
       />
@@ -32,8 +30,7 @@ export function TypeReferenceInput(props: TypeReferenceInputProps) {
           {index > 0 && '，'}
           {typeParameter.descriptions[props.language]?.name}的是
           <TypeReferenceInput
-            modelId={props.modelId}
-            moduleId={props.moduleId}
+            typeParameterModelId={props.typeParameterModelId}
             language={props.language}
             value={typeParameter.constraintType}
             onChange={(value) => props.onChange?.(props.value?.editTypeArgument(typeParameter.id, value) || null)}

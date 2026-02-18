@@ -45,23 +45,8 @@ export enum Multiplicity {
   Multiple = '0..n',
 }
 
-export enum BaseModelType {
-  None = 'none',
-
-  Boolean = 'boolean',
-  Integer = 'integer',
-  Decimal = 'decimal',
-  String = 'string',
-  Date = 'date',
-  DateTime = 'datetime',
-  Time = 'time',
-
-  Awaitable = 'awaitable',
-}
-
 export enum TypeReferenceType {
   Model = 'model',
-  BaseModel = 'base-model',
   TypeParameter = 'type-parameter',
 }
 

@@ -1,14 +1,14 @@
-import { BaseModelType, ModelId, ModuleId } from '@/models/modeling/values';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import { Language } from '@/models/modeling/values';
-import { useState } from 'react';
-import { ModelInfo } from '@/models/modeling/info/model-info';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useModel } from '@/hooks/modeling/use-model';
+import { useProjectModels } from '@/hooks/modeling/use-models';
+import { useProjectModules } from '@/hooks/modeling/use-modules';
+import { cn } from '@/lib/utils';
 import { TypeReference } from '@/models/modeling/type-reference';
+import { Language, ModelId, TypeReferenceType } from '@/models/modeling/values';
+import { useState } from 'react';
 
 export type TypeReferenceSelectorProps = {
-  moduleId: ModuleId | null;
   modelId: ModelId | null;
   language: Language;
   value: TypeReference | null;
@@ -17,11 +17,19 @@ export type TypeReferenceSelectorProps = {
 
 export function TypeReferenceSelector(props: TypeReferenceSelectorProps) {
   const [open, setOpen] = useState(false);
-  const [items, setItems] = useState<ModelInfo[]>([]);
   const [searchText, setSearchText] = useState('');
-  const selectedItem = items.find((item) => item.id === props.value?.modelId);
-  const itemsOfModules = Object.groupBy(items, (item) => item.moduleId);
   const { model } = useModel(props.modelId);
+  const { modules } = useProjectModules(model?.projectId ?? null);
+  const { models } = useProjectModels(model?.projectId ?? null);
+  const modelsOfModules = Map.groupBy(models, (model) => model.moduleId);
+
+  const label =
+    props.value?.type === TypeReferenceType.Model
+      ? models.find((model) => model.id === props.value?.modelId)?.descriptions[props.language]?.name
+      : props.value?.type === TypeReferenceType.TypeParameter
+        ? model?.typeParameters.find((typeParameter) => typeParameter.id === props.value?.typeParameterId)
+            ?.descriptions[props.language]?.name
+        : '';
 
   return (
     <Popover
@@ -34,7 +42,7 @@ export function TypeReferenceSelector(props: TypeReferenceSelectorProps) {
       }}
     >
       <PopoverTrigger>
-        <span className="cursor-pointer underline">{selectedItem ? selectedItem.name : '某模型'}</span>
+        <span className={cn('cursor-pointer underline', { 'opacity-50': !label })}>{label || '某模型'}</span>
       </PopoverTrigger>
       <PopoverContent className="p-0 w-36">
         <Command className="space-y-2">
@@ -50,57 +58,56 @@ export function TypeReferenceSelector(props: TypeReferenceSelectorProps) {
                 {model.typeParameters.map((typeParameter) => (
                   <CommandItem
                     key={typeParameter.id}
-                    value={String(typeParameter.id)}
+                    value={`${typeParameter.descriptions[props.language]?.name}/${typeParameter.id}/${model.descriptions[props.language]?.name}`}
                     onSelect={() => props.onChange?.(TypeReference.createTypeParameter(model.id, typeParameter.id))}
+                    data-checked={
+                      props.value?.type === TypeReferenceType.TypeParameter &&
+                      props.value?.typeParameterId === typeParameter.id
+                        ? 'true'
+                        : 'false'
+                    }
                   >
                     {typeParameter.descriptions[props.language]?.name}
                   </CommandItem>
                 ))}
               </CommandGroup>
             )}
-            {baseModelItems.map((item) => (
-              <CommandItem
-                key={item.type}
-                value={String(item.type)}
-                onSelect={() => props.onChange?.(TypeReference.createBaseModel(item.type))}
-              >
-                {item.name}
-              </CommandItem>
-            ))}
-            {Object.entries(itemsOfModules).map(
-              ([moduleId, items]) =>
+            {modelsOfModules.entries().map(([moduleId, items]) => {
+              const modelModule = modules.find((module) => module.id === moduleId);
+
+              if (!modelModule) {
+                return;
+              }
+
+              return (
                 items && (
-                  <CommandGroup key={moduleId} heading={items[0].moduleName}>
-                    {items.map((model) => {
+                  <CommandGroup key={moduleId} heading={modelModule.descriptions[props.language]?.name}>
+                    {items.map((modelOfModule) => {
                       return (
                         <CommandItem
-                          key={String(model.id)}
-                          value={String(model.id)}
-                          onSelect={() => props.onChange?.(TypeReference.createModel(model.id))}
+                          key={String(modelOfModule.id)}
+                          value={`${modelOfModule.descriptions[props.language]?.name}/${modelOfModule.id}/${modelModule.descriptions[props.language]?.name}`}
+                          onSelect={() => props.onChange?.(TypeReference.createModel(modelOfModule.id))}
+                          data-checked={
+                            props.value?.type === TypeReferenceType.Model && props.value?.modelId === modelOfModule.id
+                              ? 'true'
+                              : 'false'
+                          }
                         >
-                          {model.name}
-                          {model.moduleId !== props.moduleId ? ` (${model.moduleName}功能)` : ''}
+                          {modelOfModule.descriptions[props.language]?.name}
+                          {modelOfModule.moduleId !== model?.moduleId
+                            ? ` (${modelModule.descriptions[props.language]?.name})`
+                            : ''}
                         </CommandItem>
                       );
                     })}
                   </CommandGroup>
-                ),
-            )}
+                )
+              );
+            })}
           </CommandList>
         </Command>
       </PopoverContent>
     </Popover>
   );
 }
-
-const baseModelItems = [
-  { type: BaseModelType.None, name: '無' },
-  { type: BaseModelType.String, name: '字串' },
-  { type: BaseModelType.Integer, name: '整數' },
-  { type: BaseModelType.Decimal, name: '小數' },
-  { type: BaseModelType.Boolean, name: '是或否' },
-  { type: BaseModelType.Date, name: '日期' },
-  { type: BaseModelType.DateTime, name: '日期時間' },
-  { type: BaseModelType.Time, name: '時間' },
-  { type: BaseModelType.Awaitable, name: '需等待的模型' },
-];

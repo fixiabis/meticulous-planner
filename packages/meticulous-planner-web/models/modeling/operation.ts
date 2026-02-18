@@ -58,11 +58,33 @@ export class Operation implements OperationProps {
     return this.withProps({ returnMultiplicity });
   }
 
-  addParameter(parameter: Parameter) {
-    return this.withProps({ parameters: [...this.parameters, parameter] });
+  private withParameter(parameterId: ParameterId, edit: (parameter: Parameter) => Parameter) {
+    return this.withProps({
+      parameters: this.parameters.map((param) => (param.id === parameterId ? edit(param) : param)),
+    });
+  }
+
+  addParameter(parameterId: ParameterId) {
+    return this.withProps({ parameters: [...this.parameters, Parameter.create({ id: parameterId })] });
   }
 
   removeParameter(parameterId: ParameterId) {
     return this.withProps({ parameters: this.parameters.filter((parameter) => parameter.id !== parameterId) });
+  }
+
+  removeAllParameters() {
+    return this.withProps({ parameters: [] });
+  }
+
+  renameParameter(parameterId: ParameterId, name: string, language: Language): Operation {
+    return this.withParameter(parameterId, (param) => param.rename(name, language));
+  }
+
+  editParameterType(parameterId: ParameterId, type: TypeReference) {
+    return this.withParameter(parameterId, (param) => param.editType(type));
+  }
+
+  editParameterMultiplicity(parameterId: ParameterId, multiplicity: Multiplicity) {
+    return this.withParameter(parameterId, (param) => param.editMultiplicity(multiplicity));
   }
 }
