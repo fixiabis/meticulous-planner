@@ -1,6 +1,6 @@
 import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { useProjectModules } from '@/hooks/modeling/use-modules';
+import { useProjectModules } from '@/hooks/modeling/queries';
 import { cn } from '@/lib/utils';
 import { Language, ModuleId, ProjectId } from '@/models/modeling/values';
 import { useState } from 'react';

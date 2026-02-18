@@ -1,7 +1,7 @@
 import { ModelingCommandType } from '@/models/modeling/messages/commands';
 import { Language, ModuleId, ProjectId } from '@/models/modeling/values';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useModelingService } from './use-modeling-service';
+import { useModelingService } from './modeling-service';
 
 export function useAddModule() {
   const modelingService = useModelingService();

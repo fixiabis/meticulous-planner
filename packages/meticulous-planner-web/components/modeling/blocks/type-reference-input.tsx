@@ -1,4 +1,4 @@
-import { useModel } from '@/hooks/modeling/use-model';
+import { useModel } from '@/hooks/modeling/queries';
 import { cn } from '@/lib/utils';
 import { TypeReference } from '@/models/modeling/type-reference';
 import { Language, ModelId } from '@/models/modeling/values';

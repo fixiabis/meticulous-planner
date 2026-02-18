@@ -2,7 +2,7 @@ import { ModelingCommandType } from '@/models/modeling/messages/commands';
 import { TypeReference } from '@/models/modeling/type-reference';
 import { Language, ModelId, Multiplicity, OperationId, ParameterId } from '@/models/modeling/values';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useModelingService } from './use-modeling-service';
+import { useModelingService } from './modeling-service';
 
 function invalidateModel(queryClient: ReturnType<typeof useQueryClient>, modelId: ModelId, projectId: string | null) {
   queryClient.invalidateQueries({ queryKey: ['model', modelId] });

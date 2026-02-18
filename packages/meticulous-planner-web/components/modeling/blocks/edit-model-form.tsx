@@ -1,17 +1,17 @@
 import { ContentEditable } from '@/components/base/content-editable';
 import { Select } from '@/components/base/select';
-import { useModel } from '@/hooks/modeling/use-model';
 import {
   useEditModelGeneralizationType,
   useEditModelStereotype,
   useRenameModel,
-} from '@/hooks/modeling/use-model-commands';
+} from '@/hooks/modeling/model-commands';
 import {
   useAddModelTypeParameter,
   useEditModelTypeParameterConstraintType,
   useRemoveAllModelTypeParameters,
   useRenameModelTypeParameter,
-} from '@/hooks/modeling/use-model-type-parameter-commands';
+} from '@/hooks/modeling/model-type-parameter-commands';
+import { useModel } from '@/hooks/modeling/queries';
 import { cn } from '@/lib/utils';
 import { TypeReference } from '@/models/modeling/type-reference';
 import { Language, ModelId, TypeParameterId } from '@/models/modeling/values';

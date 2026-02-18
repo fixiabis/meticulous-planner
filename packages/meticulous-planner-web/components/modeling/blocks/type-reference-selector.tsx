@@ -1,8 +1,6 @@
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { useModel } from '@/hooks/modeling/use-model';
-import { useProjectModels } from '@/hooks/modeling/use-models';
-import { useProjectModules } from '@/hooks/modeling/use-modules';
+import { useModel, useProjectModels, useProjectModules } from '@/hooks/modeling/queries';
 import { cn } from '@/lib/utils';
 import { TypeReference } from '@/models/modeling/type-reference';
 import { Language, ModelId, TypeReferenceType } from '@/models/modeling/values';
