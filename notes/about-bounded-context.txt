@@ -5,4 +5,9 @@ model 也是，我們會在專案中，一個 subdomain 中建立新的 models
 domain 是整體, project = domain, domain = system
 domain 有多個 subdomain 和一個 core domain
 subdomain 自身有 bounded-context
-subdomain 之間有 bounded-context
+subdomain 中可能有多個 bounded-context
+
+概念對應
+domain / system
+subdomain / packages
+bounded-context / modules
