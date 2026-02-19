@@ -9,6 +9,7 @@ export function useModel(modelId: ModelId | null) {
   const { data: model, isLoading } = useQuery({
     queryKey: ['model', modelId],
     queryFn: () => modelId && modelingService.getModel({ type: ModelingQueryType.GetModel, modelId }),
+    enabled: Boolean(modelId),
   });
 
   return { model: model ?? null, isLoading };
@@ -20,6 +21,7 @@ export function useProjectModels(projectId: ProjectId | null) {
   const { data: models, isLoading } = useQuery({
     queryKey: ['models', `?projectId=${projectId}`],
     queryFn: () => projectId ? modelingService.getProjectModels({ type: ModelingQueryType.GetProjectModels, projectId }) : [],
+    enabled: Boolean(projectId),
   });
 
   return { models: models ?? [], isLoading };
@@ -31,6 +33,7 @@ export function useProjectModules(projectId: ProjectId | null) {
   const { data: modules, isLoading } = useQuery({
     queryKey: ['modules', `?projectId=${projectId}`],
     queryFn: () => projectId ? modelingService.getProjectModules({ type: ModelingQueryType.GetProjectModules, projectId }) : [],
+    enabled: Boolean(projectId),
   });
 
   return { modules: modules ?? [], isLoading };

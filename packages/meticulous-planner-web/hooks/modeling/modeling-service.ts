@@ -1,3 +1,4 @@
+import { buildBaseModels } from '@/models/modeling/base';
 import { Description } from '@/models/modeling/description';
 import {
   AddModel,
@@ -33,8 +34,7 @@ import {
 import { GetModel, GetProjectModels, GetProjectModules } from '@/models/modeling/messages/queries';
 import { Model } from '@/models/modeling/model';
 import { Module } from '@/models/modeling/module';
-import { TypeParameter } from '@/models/modeling/type-parameter';
-import { Language, ModelId, ModuleId, Stereotype, TypeParameterId } from '@/models/modeling/values';
+import { ModelId, ModuleId } from '@/models/modeling/values';
 import { create } from 'zustand';
 
 export interface ModelingService {
@@ -90,76 +90,7 @@ const useModelingStore = create<ModelingStore>((set, get) => ({
   async getProjectModels(query) {
     return get()
       .models.filter((model) => model.projectId === query.projectId)
-      .concat([
-        Model.create({
-          id: ModelId('base-string'),
-          projectId: query.projectId,
-          moduleId: ModuleId('base'),
-          stereotype: Stereotype.ValueObject,
-          descriptions: { [Language.Chinese]: Description.create({ name: '文字', language: Language.Chinese }) },
-        }),
-        Model.create({
-          id: ModelId('base-integer'),
-          projectId: query.projectId,
-          moduleId: ModuleId('base'),
-          stereotype: Stereotype.ValueObject,
-          descriptions: { [Language.Chinese]: Description.create({ name: '整數', language: Language.Chinese }) },
-        }),
-        Model.create({
-          id: ModelId('base-decimal'),
-          projectId: query.projectId,
-          moduleId: ModuleId('base'),
-          stereotype: Stereotype.ValueObject,
-          descriptions: {
-            [Language.Chinese]: Description.create({ name: '有小數點的數字', language: Language.Chinese }),
-          },
-        }),
-        Model.create({
-          id: ModelId('base-boolean'),
-          projectId: query.projectId,
-          moduleId: ModuleId('base'),
-          stereotype: Stereotype.ValueObject,
-          descriptions: { [Language.Chinese]: Description.create({ name: '是或否', language: Language.Chinese }) },
-        }),
-        Model.create({
-          id: ModelId('base-date'),
-          projectId: query.projectId,
-          moduleId: ModuleId('base'),
-          stereotype: Stereotype.ValueObject,
-          descriptions: { [Language.Chinese]: Description.create({ name: '日期', language: Language.Chinese }) },
-        }),
-        Model.create({
-          id: ModelId('base-datetime'),
-          projectId: query.projectId,
-          moduleId: ModuleId('base'),
-          stereotype: Stereotype.ValueObject,
-          descriptions: { [Language.Chinese]: Description.create({ name: '日期時間', language: Language.Chinese }) },
-        }),
-        Model.create({
-          id: ModelId('base-time'),
-          projectId: query.projectId,
-          moduleId: ModuleId('base'),
-          stereotype: Stereotype.ValueObject,
-          descriptions: { [Language.Chinese]: Description.create({ name: '時間', language: Language.Chinese }) },
-        }),
-        Model.create({
-          id: ModelId('base-awaitable'),
-          projectId: query.projectId,
-          moduleId: ModuleId('base'),
-          stereotype: Stereotype.ValueObject,
-          descriptions: {
-            [Language.Chinese]: Description.create({ name: '需等待的模型', language: Language.Chinese }),
-          },
-          typeParameters: [
-            TypeParameter.create({
-              id: TypeParameterId('base-awaitable-item'),
-              descriptions: {
-                [Language.Chinese]: Description.create({ name: '等待的模型', language: Language.Chinese }),
-              },
-            }),
-          ],
-        }),
-      ]);
+      .concat(buildBaseModels(query.projectId));
   },
 
   async getProjectModules(query) {
