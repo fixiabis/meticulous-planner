@@ -8,19 +8,19 @@ import {
   AttributeId,
   Language,
   ModelId,
-  ModuleId,
+  ServiceId,
   Multiplicity,
   OperationId,
   ParameterId,
-  ProjectId,
+  SystemId,
   Stereotype,
   TypeParameterId,
 } from './values';
 
 export type ModelProps = {
   readonly id: ModelId;
-  readonly projectId: ProjectId;
-  readonly moduleId: ModuleId | null;
+  readonly systemId: SystemId;
+  readonly serviceId: ServiceId | null;
   readonly stereotype: Stereotype;
   readonly generalizationType: TypeReference | null;
   readonly attributes: readonly Attribute[];
@@ -30,14 +30,14 @@ export type ModelProps = {
   readonly descriptions: Readonly<Partial<Record<Language, Description>>>;
 };
 
-export type WithModelProps = Partial<Omit<ModelProps, 'id' | 'projectId'>>;
+export type WithModelProps = Partial<Omit<ModelProps, 'id' | 'systemId'>>;
 
-export type CreateModelProps = Partial<ModelProps> & Pick<ModelProps, 'id' | 'projectId'>;
+export type CreateModelProps = Partial<ModelProps> & Pick<ModelProps, 'id' | 'systemId'>;
 
 export class Model implements ModelProps {
   readonly id: ModelId;
-  readonly projectId: ProjectId;
-  readonly moduleId: ModuleId | null;
+  readonly systemId: SystemId;
+  readonly serviceId: ServiceId | null;
   readonly stereotype: Stereotype;
   readonly generalizationType: TypeReference | null;
   readonly attributes: readonly Attribute[];
@@ -48,8 +48,8 @@ export class Model implements ModelProps {
 
   constructor(props: ModelProps) {
     this.id = props.id;
-    this.projectId = props.projectId;
-    this.moduleId = props.moduleId;
+    this.systemId = props.systemId;
+    this.serviceId = props.serviceId;
     this.stereotype = props.stereotype;
     this.generalizationType = props.generalizationType;
     this.attributes = props.attributes;
@@ -62,8 +62,8 @@ export class Model implements ModelProps {
   static create(props: CreateModelProps) {
     return new Model({
       id: props.id,
-      projectId: props.projectId ?? null,
-      moduleId: props.moduleId ?? null,
+      systemId: props.systemId ?? null,
+      serviceId: props.serviceId ?? null,
       stereotype: props.stereotype ?? Stereotype.Entity,
       generalizationType: props.generalizationType ?? null,
       attributes: props.attributes ?? [],

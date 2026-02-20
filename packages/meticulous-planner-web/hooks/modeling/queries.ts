@@ -1,5 +1,5 @@
 import { ModelingQueryType } from '@/models/modeling/messages/queries';
-import { ModelId, ProjectId } from '@/models/modeling/values';
+import { ModelId, SystemId } from '@/models/modeling/values';
 import { useQuery } from '@tanstack/react-query';
 import { useModelingService } from './modeling-service';
 
@@ -15,27 +15,32 @@ export function useModel(modelId: ModelId | null) {
   return { model: model ?? null, isLoading };
 }
 
-export function useProjectModels(projectId: ProjectId | null) {
+export function useSystemModels(systemId: SystemId | null) {
   const modelingService = useModelingService();
 
   const { data: models, isLoading } = useQuery({
-    queryKey: ['models', `?projectId=${projectId}`],
-    queryFn: () => projectId ? modelingService.getProjectModels({ type: ModelingQueryType.GetProjectModels, projectId }) : [],
-    enabled: Boolean(projectId),
+    queryKey: ['models', `?systemId=${systemId}`],
+    queryFn: () =>
+      systemId
+        ? modelingService.getSystemModels({ type: ModelingQueryType.GetSystemModels, systemId: systemId })
+        : [],
+    enabled: Boolean(systemId),
   });
 
   return { models: models ?? [], isLoading };
 }
 
-export function useProjectModules(projectId: ProjectId | null) {
+export function useSystemServices(systemId: SystemId | null) {
   const modelingService = useModelingService();
 
-  const { data: modules, isLoading } = useQuery({
-    queryKey: ['modules', `?projectId=${projectId}`],
-    queryFn: () => projectId ? modelingService.getProjectModules({ type: ModelingQueryType.GetProjectModules, projectId }) : [],
-    enabled: Boolean(projectId),
+  const { data: services, isLoading } = useQuery({
+    queryKey: ['services', `?systemId=${systemId}`],
+    queryFn: () =>
+      systemId
+        ? modelingService.getSystemServices({ type: ModelingQueryType.GetSystemServices, systemId: systemId })
+        : [],
+    enabled: Boolean(systemId),
   });
 
-  return { modules: modules ?? [], isLoading };
+  return { services: services ?? [], isLoading };
 }
-

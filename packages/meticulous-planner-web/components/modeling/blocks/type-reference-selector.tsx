@@ -1,6 +1,6 @@
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { useModel, useProjectModels, useProjectModules } from '@/hooks/modeling/queries';
+import { useModel, useSystemModels, useSystemServices } from '@/hooks/modeling/queries';
 import { cn } from '@/lib/utils';
 import { TypeReference } from '@/models/modeling/type-reference';
 import { Language, ModelId, TypeReferenceType } from '@/models/modeling/values';
@@ -17,9 +17,9 @@ export function TypeReferenceSelector(props: TypeReferenceSelectorProps) {
   const [open, setOpen] = useState(false);
   const [searchText, setSearchText] = useState('');
   const { model } = useModel(props.modelId);
-  const { modules } = useProjectModules(model?.projectId ?? null);
-  const { models } = useProjectModels(model?.projectId ?? null);
-  const modelsOfModules = Map.groupBy(models, (model) => model.moduleId);
+  const { services } = useSystemServices(model?.systemId ?? null);
+  const { models } = useSystemModels(model?.systemId ?? null);
+  const modelsOfServices = Map.groupBy(models, (model) => model.serviceId);
 
   const label =
     props.value?.type === TypeReferenceType.Model
@@ -70,31 +70,31 @@ export function TypeReferenceSelector(props: TypeReferenceSelectorProps) {
                 ))}
               </CommandGroup>
             )}
-            {modelsOfModules.entries().map(([moduleId, items]) => {
-              const modelModule = modules.find((module) => module.id === moduleId);
+            {modelsOfServices.entries().map(([serviceId, items]) => {
+              const modelService = services.find((service) => service.id === serviceId);
 
-              if (!modelModule) {
+              if (!modelService) {
                 return;
               }
 
               return (
                 items && (
-                  <CommandGroup key={moduleId} heading={modelModule.descriptions[props.language]?.name}>
-                    {items.map((modelOfModule) => {
+                  <CommandGroup key={serviceId} heading={modelService.descriptions[props.language]?.name}>
+                    {items.map((modelOfService) => {
                       return (
                         <CommandItem
-                          key={String(modelOfModule.id)}
-                          value={`${modelOfModule.descriptions[props.language]?.name}/${modelOfModule.id}/${modelModule.descriptions[props.language]?.name}`}
-                          onSelect={() => props.onChange?.(TypeReference.createModel(modelOfModule.id))}
+                          key={String(modelOfService.id)}
+                          value={`${modelOfService.descriptions[props.language]?.name}/${modelOfService.id}/${modelService.descriptions[props.language]?.name}`}
+                          onSelect={() => props.onChange?.(TypeReference.createModel(modelOfService.id))}
                           data-checked={
-                            props.value?.type === TypeReferenceType.Model && props.value?.modelId === modelOfModule.id
+                            props.value?.type === TypeReferenceType.Model && props.value?.modelId === modelOfService.id
                               ? 'true'
                               : 'false'
                           }
                         >
-                          {modelOfModule.descriptions[props.language]?.name}
-                          {modelOfModule.moduleId !== model?.moduleId
-                            ? ` (${modelModule.descriptions[props.language]?.name})`
+                          {modelOfService.descriptions[props.language]?.name}
+                          {modelOfService.serviceId !== model?.serviceId
+                            ? ` (${modelService.descriptions[props.language]?.name})`
                             : ''}
                         </CommandItem>
                       );

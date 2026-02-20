@@ -1,8 +1,8 @@
-export type ProjectId = string & { readonly __brand: 'ProjectId' };
-export const ProjectId = (value: string) => value as ProjectId;
+export type SystemId = string & { readonly __brand: 'SystemId' };
+export const SystemId = (value: string) => value as SystemId;
 
-export type ModuleId = string & { readonly __brand: 'ModuleId' };
-export const ModuleId = (value: string) => value as ModuleId;
+export type ServiceId = string & { readonly __brand: 'ServiceId' };
+export const ServiceId = (value: string) => value as ServiceId;
 
 export type ModelId = string & { readonly __brand: 'ModelId' };
 export const ModelId = (value: string) => value as ModelId;

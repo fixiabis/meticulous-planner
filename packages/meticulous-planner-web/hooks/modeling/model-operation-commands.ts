@@ -4,10 +4,10 @@ import { Language, ModelId, Multiplicity, OperationId } from '@/models/modeling/
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useModelingService } from './modeling-service';
 
-function invalidateModel(queryClient: ReturnType<typeof useQueryClient>, modelId: ModelId, projectId: string | null) {
+function invalidateModel(queryClient: ReturnType<typeof useQueryClient>, modelId: ModelId, systemId: string | null) {
   queryClient.invalidateQueries({ queryKey: ['model', modelId] });
-  if (projectId) {
-    queryClient.invalidateQueries({ queryKey: ['models', `?projectId=${projectId}`] });
+  if (systemId) {
+    queryClient.invalidateQueries({ queryKey: ['models', `?systemId=${systemId}`] });
   }
 }
 
@@ -18,7 +18,7 @@ export function useAddModelOperation() {
   const { mutateAsync: addModelOperation, isPending } = useMutation({
     mutationFn: (params: { modelId: ModelId; operationId: OperationId }) =>
       modelingService.addModelOperation({ type: ModelingCommandType.AddModelOperation, ...params }),
-    onSuccess: (model) => invalidateModel(queryClient, model.id, model.projectId),
+    onSuccess: (model) => invalidateModel(queryClient, model.id, model.systemId),
   });
 
   return { addModelOperation, isPending };
@@ -31,7 +31,7 @@ export function useRemoveModelOperation() {
   const { mutateAsync: removeModelOperation, isPending } = useMutation({
     mutationFn: (params: { modelId: ModelId; operationId: OperationId }) =>
       modelingService.removeModelOperation({ type: ModelingCommandType.RemoveModelOperation, ...params }),
-    onSuccess: (model) => invalidateModel(queryClient, model.id, model.projectId),
+    onSuccess: (model) => invalidateModel(queryClient, model.id, model.systemId),
   });
 
   return { removeModelOperation, isPending };
@@ -44,7 +44,7 @@ export function useRemoveAllModelOperations() {
   const { mutateAsync: removeAllModelOperations, isPending } = useMutation({
     mutationFn: (params: { modelId: ModelId }) =>
       modelingService.removeAllModelOperations({ type: ModelingCommandType.RemoveAllModelOperations, ...params }),
-    onSuccess: (model) => invalidateModel(queryClient, model.id, model.projectId),
+    onSuccess: (model) => invalidateModel(queryClient, model.id, model.systemId),
   });
 
   return { removeAllModelOperations, isPending };
@@ -57,7 +57,7 @@ export function useRenameModelOperation() {
   const { mutateAsync: renameModelOperation, isPending } = useMutation({
     mutationFn: (params: { modelId: ModelId; operationId: OperationId; name: string; language: Language }) =>
       modelingService.renameModelOperation({ type: ModelingCommandType.RenameModelOperation, ...params }),
-    onSuccess: (model) => invalidateModel(queryClient, model.id, model.projectId),
+    onSuccess: (model) => invalidateModel(queryClient, model.id, model.systemId),
   });
 
   return { renameModelOperation, isPending };
@@ -73,7 +73,7 @@ export function useEditModelOperationReturnType() {
         type: ModelingCommandType.EditModelOperationReturnType,
         ...params,
       }),
-    onSuccess: (model) => invalidateModel(queryClient, model.id, model.projectId),
+    onSuccess: (model) => invalidateModel(queryClient, model.id, model.systemId),
   });
 
   return { editModelOperationReturnType, isPending };
@@ -89,7 +89,7 @@ export function useEditModelOperationMultiplicity() {
         type: ModelingCommandType.EditModelOperationMultiplicity,
         ...params,
       }),
-    onSuccess: (model) => invalidateModel(queryClient, model.id, model.projectId),
+    onSuccess: (model) => invalidateModel(queryClient, model.id, model.systemId),
   });
 
   return { editModelOperationMultiplicity, isPending };

@@ -6,7 +6,7 @@ import {
   AddModelOperation,
   AddModelOperationParameter,
   AddModelTypeParameter,
-  AddModule,
+  AddService,
   EditModelAttributeMultiplicity,
   EditModelAttributeType,
   EditModelGeneralizationType,
@@ -29,21 +29,21 @@ import {
   RenameModelOperation,
   RenameModelOperationParameter,
   RenameModelTypeParameter,
-  RenameModule,
+  RenameService,
 } from '@/models/modeling/messages/commands';
-import { GetModel, GetProjectModels, GetProjectModules } from '@/models/modeling/messages/queries';
+import { GetModel, GetSystemModels, GetSystemServices } from '@/models/modeling/messages/queries';
 import { Model } from '@/models/modeling/model';
-import { Module } from '@/models/modeling/module';
-import { ModelId, ModuleId } from '@/models/modeling/values';
+import { Service } from '@/models/modeling/service';
+import { ModelId, ServiceId } from '@/models/modeling/values';
 import { create } from 'zustand';
 
 export interface ModelingService {
-  getProjectModels(query: GetProjectModels): Promise<Model[]>;
-  getProjectModules(query: GetProjectModules): Promise<Module[]>;
+  getSystemModels(query: GetSystemModels): Promise<Model[]>;
+  getSystemServices(query: GetSystemServices): Promise<Service[]>;
   getModel(query: GetModel): Promise<Model>;
-  // Module
-  addModule(command: AddModule): Promise<Module>;
-  renameModule(command: RenameModule): Promise<Module>;
+  // Service
+  addService(command: AddService): Promise<Service>;
+  renameService(command: RenameService): Promise<Service>;
   // Model
   addModel(command: AddModel): Promise<Model>;
   renameModel(command: RenameModel): Promise<Model>;
@@ -80,23 +80,23 @@ export interface ModelingService {
 
 export type ModelingStore = ModelingService & {
   models: Model[];
-  modules: Module[];
+  services: Service[];
 };
 
 const useModelingStore = create<ModelingStore>((set, get) => ({
   models: [],
-  modules: [],
+  services: [],
 
-  async getProjectModels(query) {
+  async getSystemModels(query) {
     return get()
-      .models.filter((model) => model.projectId === query.projectId)
-      .concat(buildBaseModels(query.projectId));
+      .models.filter((model) => model.systemId === query.systemId)
+      .concat(buildBaseModels(query.systemId));
   },
 
-  async getProjectModules(query) {
+  async getSystemServices(query) {
     return get()
-      .modules.filter((module) => module.projectId === query.projectId)
-      .concat([Module.create({ id: ModuleId('base'), projectId: query.projectId, isBase: true })]);
+      .services.filter((service) => service.systemId === query.systemId)
+      .concat([Service.create({ id: ServiceId('base'), systemId: query.systemId, isBase: true })]);
   },
 
   async getModel(query) {
@@ -109,32 +109,32 @@ const useModelingStore = create<ModelingStore>((set, get) => ({
     return model;
   },
 
-  // Module
+  // Service
 
-  async addModule(command) {
-    const newModule = Module.create({
-      id: ModuleId(crypto.randomUUID()),
-      projectId: command.projectId,
+  async addService(command) {
+    const newService = Service.create({
+      id: ServiceId(crypto.randomUUID()),
+      systemId: command.systemId,
       descriptions: {
         [command.language]: Description.create({ name: command.name, language: command.language }),
       },
     });
 
-    set({ modules: [...get().modules, newModule] });
+    set({ services: [...get().services, newService] });
 
-    return newModule;
+    return newService;
   },
 
-  async renameModule(command) {
-    const modules = get().modules;
-    const found = modules.find((m) => m.id === command.moduleId);
+  async renameService(command) {
+    const services = get().services;
+    const found = services.find((m) => m.id === command.serviceId);
 
     if (!found) {
-      throw new Error('Module not found');
+      throw new Error('Service not found');
     }
 
     const updated = found.rename(command.name, command.language);
-    set({ modules: modules.map((m) => (m.id === command.moduleId ? updated : m)) });
+    set({ services: services.map((m) => (m.id === command.serviceId ? updated : m)) });
 
     return updated;
   },
@@ -144,8 +144,8 @@ const useModelingStore = create<ModelingStore>((set, get) => ({
   async addModel(command) {
     const model = Model.create({
       id: ModelId(crypto.randomUUID()),
-      projectId: command.projectId,
-      moduleId: command.moduleId,
+      systemId: command.systemId,
+      serviceId: command.serviceId,
       descriptions: {
         [command.language]: Description.create({
           name: command.name,

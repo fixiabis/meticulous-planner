@@ -1,19 +1,19 @@
-import { ModelId, ProjectId } from '../values';
+import { ModelId, SystemId } from '../values';
 
 export enum ModelingQueryType {
-  GetProjectModels = 'get-project-models',
-  GetProjectModules = 'get-project-modules',
+  GetSystemModels = 'get-system-models',
+  GetSystemServices = 'get-system-services',
   GetModel = 'get-model',
 }
 
-export type GetProjectModels = {
-  type: ModelingQueryType.GetProjectModels;
-  projectId: ProjectId;
+export type GetSystemModels = {
+  type: ModelingQueryType.GetSystemModels;
+  systemId: SystemId;
 };
 
-export type GetProjectModules = {
-  type: ModelingQueryType.GetProjectModules;
-  projectId: ProjectId;
+export type GetSystemServices = {
+  type: ModelingQueryType.GetSystemServices;
+  systemId: SystemId;
 };
 
 export type GetModel = {

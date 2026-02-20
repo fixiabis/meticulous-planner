@@ -9,7 +9,7 @@ subdomain 中可能有多個 bounded-context
 
 概念對應
 domain / system
-subdomain / modules
+subdomain / services
 bounded-context / packages
 
 domains > core-domain/subdomain > bounded-context > model

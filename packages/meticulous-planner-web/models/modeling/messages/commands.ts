@@ -1,10 +1,21 @@
 import { TypeReference } from '../type-reference';
-import { AttributeId, Language, ModelId, ModuleId, Multiplicity, OperationId, ParameterId, ProjectId, Stereotype, TypeParameterId } from '../values';
+import {
+  AttributeId,
+  Language,
+  ModelId,
+  ServiceId,
+  Multiplicity,
+  OperationId,
+  ParameterId,
+  SystemId,
+  Stereotype,
+  TypeParameterId,
+} from '../values';
 
 export enum ModelingCommandType {
-  // Module
-  AddModule = 'add-module',
-  RenameModule = 'rename-module',
+  // Service
+  AddService = 'add-service',
+  RenameService = 'rename-service',
   // Model
   AddModel = 'add-model',
   RenameModel = 'rename-model',
@@ -39,18 +50,18 @@ export enum ModelingCommandType {
   EditModelTypeParameterConstraintType = 'edit-model-type-parameter-constraint-type',
 }
 
-// Module
+// Service
 
-export type AddModule = {
-  readonly type: ModelingCommandType.AddModule;
-  readonly projectId: ProjectId;
+export type AddService = {
+  readonly type: ModelingCommandType.AddService;
+  readonly systemId: SystemId;
   readonly name: string;
   readonly language: Language;
 };
 
-export type RenameModule = {
-  readonly type: ModelingCommandType.RenameModule;
-  readonly moduleId: ModuleId;
+export type RenameService = {
+  readonly type: ModelingCommandType.RenameService;
+  readonly serviceId: ServiceId;
   readonly name: string;
   readonly language: Language;
 };
@@ -59,8 +70,8 @@ export type RenameModule = {
 
 export type AddModel = {
   readonly type: ModelingCommandType.AddModel;
-  readonly projectId: ProjectId;
-  readonly moduleId: ModuleId;
+  readonly systemId: SystemId;
+  readonly serviceId: ServiceId;
   readonly name: string;
   readonly language: Language;
 };
@@ -248,8 +259,8 @@ export type EditModelTypeParameterConstraintType = {
 };
 
 export type ModelingCommand =
-  | AddModule
-  | RenameModule
+  | AddService
+  | RenameService
   | AddModel
   | RenameModel
   | EditModelStereotype

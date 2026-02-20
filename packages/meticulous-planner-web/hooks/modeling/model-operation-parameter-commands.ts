@@ -4,10 +4,10 @@ import { Language, ModelId, Multiplicity, OperationId, ParameterId } from '@/mod
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useModelingService } from './modeling-service';
 
-function invalidateModel(queryClient: ReturnType<typeof useQueryClient>, modelId: ModelId, projectId: string | null) {
+function invalidateModel(queryClient: ReturnType<typeof useQueryClient>, modelId: ModelId, systemId: string | null) {
   queryClient.invalidateQueries({ queryKey: ['model', modelId] });
-  if (projectId) {
-    queryClient.invalidateQueries({ queryKey: ['models', `?projectId=${projectId}`] });
+  if (systemId) {
+    queryClient.invalidateQueries({ queryKey: ['models', `?systemId=${systemId}`] });
   }
 }
 
@@ -21,7 +21,7 @@ export function useAddModelOperationParameter() {
         type: ModelingCommandType.AddModelOperationParameter,
         ...params,
       }),
-    onSuccess: (model) => invalidateModel(queryClient, model.id, model.projectId),
+    onSuccess: (model) => invalidateModel(queryClient, model.id, model.systemId),
   });
 
   return { addModelOperationParameter, isPending };
@@ -37,7 +37,7 @@ export function useRemoveModelOperationParameter() {
         type: ModelingCommandType.RemoveModelOperationParameter,
         ...params,
       }),
-    onSuccess: (model) => invalidateModel(queryClient, model.id, model.projectId),
+    onSuccess: (model) => invalidateModel(queryClient, model.id, model.systemId),
   });
 
   return { removeModelOperationParameter, isPending };
@@ -53,7 +53,7 @@ export function useRemoveAllModelOperationParameters() {
         type: ModelingCommandType.RemoveAllModelOperationParameters,
         ...params,
       }),
-    onSuccess: (model) => invalidateModel(queryClient, model.id, model.projectId),
+    onSuccess: (model) => invalidateModel(queryClient, model.id, model.systemId),
   });
 
   return { removeAllModelOperationParameters, isPending };
@@ -75,7 +75,7 @@ export function useRenameModelOperationParameter() {
         type: ModelingCommandType.RenameModelOperationParameter,
         ...params,
       }),
-    onSuccess: (model) => invalidateModel(queryClient, model.id, model.projectId),
+    onSuccess: (model) => invalidateModel(queryClient, model.id, model.systemId),
   });
 
   return { renameModelOperationParameter, isPending };
@@ -96,7 +96,7 @@ export function useEditModelOperationParameterType() {
         type: ModelingCommandType.EditModelOperationParameterType,
         ...params,
       }),
-    onSuccess: (model) => invalidateModel(queryClient, model.id, model.projectId),
+    onSuccess: (model) => invalidateModel(queryClient, model.id, model.systemId),
   });
 
   return { editModelOperationParameterType, isPending };
@@ -117,7 +117,7 @@ export function useEditModelOperationParameterMultiplicity() {
         type: ModelingCommandType.EditModelOperationParameterMultiplicity,
         ...params,
       }),
-    onSuccess: (model) => invalidateModel(queryClient, model.id, model.projectId),
+    onSuccess: (model) => invalidateModel(queryClient, model.id, model.systemId),
   });
 
   return { editModelOperationParameterMultiplicity, isPending };

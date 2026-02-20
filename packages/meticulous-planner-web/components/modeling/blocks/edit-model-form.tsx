@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils';
 import { TypeReference } from '@/models/modeling/type-reference';
 import { Language, ModelId, TypeParameterId } from '@/models/modeling/values';
 import { StereotypeSelect } from '../elements/stereotype-select';
-import { ModuleSelector } from './module-selector';
+import { ServiceSelector } from './service-selector';
 import { TypeReferenceInput } from './type-reference-input';
 
 export type EditModelFormProps = {
@@ -51,7 +51,7 @@ export function EditModelForm(props: EditModelFormProps) {
     <div className={cn('p-4 space-y-1', props.className)}>
       <h1 className="text-2xl font-bold mb-2">{name}</h1>
       <p>
-        是<ModuleSelector projectId={model.projectId} language={Language.Chinese} value={model.moduleId} />
+        是<ServiceSelector systemId={model.systemId} language={Language.Chinese} value={model.serviceId} />
         中的
         <StereotypeSelect
           language={Language.Chinese}
