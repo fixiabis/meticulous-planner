@@ -13,11 +13,10 @@ subdomain / modules
 bounded-context / packages
 
 domains > core-domain/subdomain > bounded-context > model
-systems > modules > packages > components
-systems > services > projects > features
+systems > sub-system > units (containers in c4) > components
 
-services/modules/subdomain (type: 整合端（web, api, ...）、核心、支援、基底)
-bounded-contexts/packages/projects (type: 核心業務、對外接口（api, sdk）、操作套件、操作介面 (web, mobile, desktop, ...))
+sub-system/subdomain (type: 整合端（web, api, ...）、核心、支援、基底)
+bounded-contexts/units (type: 核心業務、對外接口（api, sdk）、應用程式、操作介面 (web, mobile, desktop, ...))
 
 一個領域中有多個子領域，每個子領域會有多個上下文
 一個系統中有多個模組，每個模組都會有多個套件，每個套件中有多個元件
@@ -28,3 +27,9 @@ bounded-contexts/packages/projects (type: 核心業務、對外接口（api, sdk
 後端伺服器將整合後端應用層，使用真的實作來搭建
 前端應用層將探討所有的抽象，並搭建與後端使用的模型，並建立假實作來檢驗
 前端網頁將整合前端應用層，並使用真的實作來搭建
+
+搭建系統時，初期只引導用戶在核心服務中建立專案，接著才可以新增支援服務、基底服務、整合服務等
+
+能對其進行以下操作:
+
+將 XX 
