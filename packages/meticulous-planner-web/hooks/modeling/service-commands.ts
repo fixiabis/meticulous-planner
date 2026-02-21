@@ -7,7 +7,7 @@ export function useAddService() {
   const modelingService = useModelingService();
   const queryClient = useQueryClient();
 
-  const { mutateAsync: addSystem, isPending } = useMutation({
+  const { mutateAsync: addService, isPending } = useMutation({
     mutationFn: (params: { systemId: SystemId; name: string; language: Language }) =>
       modelingService.addService({ type: ModelingCommandType.AddService, ...params }),
     onSuccess: (newService) => {
@@ -15,7 +15,7 @@ export function useAddService() {
     },
   });
 
-  return { addSystem, isPending };
+  return { addService, isPending };
 }
 
 export function useRenameService() {

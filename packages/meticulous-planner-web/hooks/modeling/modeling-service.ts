@@ -7,6 +7,7 @@ import {
   AddModelOperationParameter,
   AddModelTypeParameter,
   AddService,
+  AddSystem,
   EditModelAttributeMultiplicity,
   EditModelAttributeType,
   EditModelGeneralizationType,
@@ -30,17 +31,22 @@ import {
   RenameModelOperationParameter,
   RenameModelTypeParameter,
   RenameService,
+  RenameSystem,
 } from '@/models/modeling/messages/commands';
-import { GetModel, GetSystemModels, GetSystemServices } from '@/models/modeling/messages/queries';
+import { GetModel, GetSystemModels, GetSystems, GetSystemServices } from '@/models/modeling/messages/queries';
 import { Model } from '@/models/modeling/model';
 import { Service } from '@/models/modeling/service';
-import { ModelId, ServiceId } from '@/models/modeling/values';
+import { System } from '@/models/modeling/system';
+import { ModelId, ServiceId, SystemId } from '@/models/modeling/values';
 import { create } from 'zustand';
 
 export interface ModelingService {
+  getSystems(query: GetSystems): Promise<System[]>;
   getSystemModels(query: GetSystemModels): Promise<Model[]>;
   getSystemServices(query: GetSystemServices): Promise<Service[]>;
   getModel(query: GetModel): Promise<Model>;
+  addSystem(command: AddSystem): Promise<System>;
+  renameSystem(command: RenameSystem): Promise<System>;
   // Service
   addService(command: AddService): Promise<Service>;
   renameService(command: RenameService): Promise<Service>;
@@ -79,13 +85,24 @@ export interface ModelingService {
 }
 
 export type ModelingStore = ModelingService & {
-  models: Model[];
+  systems: System[];
   services: Service[];
+  models: Model[];
 };
 
 const useModelingStore = create<ModelingStore>((set, get) => ({
-  models: [],
+  systems: [],
   services: [],
+  models: [
+    Model.create({
+      id: ModelId('sample'),
+      systemId: SystemId('sample'),
+    }),
+  ],
+
+  async getSystems() {
+    return get().systems;
+  },
 
   async getSystemModels(query) {
     return get()
@@ -107,6 +124,35 @@ const useModelingStore = create<ModelingStore>((set, get) => ({
     }
 
     return model;
+  },
+
+  // System
+
+  async addSystem(command) {
+    const newSystem = System.create({
+      id: SystemId(crypto.randomUUID()),
+      descriptions: {
+        [command.language]: Description.create({ name: command.name, language: command.language }),
+      },
+    });
+
+    set({ systems: [...get().systems, newSystem] });
+
+    return newSystem;
+  },
+
+  async renameSystem(command) {
+    const systems = get().systems;
+    const found = systems.find((m) => m.id === command.systemId);
+
+    if (!found) {
+      throw new Error('System not found');
+    }
+
+    const updated = found.rename(command.name, command.language);
+    set({ systems: systems.map((m) => (m.id === command.systemId ? updated : m)) });
+
+    return updated;
   },
 
   // Service

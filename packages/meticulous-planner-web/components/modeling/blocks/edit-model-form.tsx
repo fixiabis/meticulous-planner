@@ -43,7 +43,7 @@ export function EditModelForm(props: EditModelFormProps) {
       className={cn({ 'inline-block min-w-24': !model.descriptions[Language.Chinese]?.name })}
       content={model.descriptions[Language.Chinese]?.name || ''}
       placeholder="模型名稱"
-      onEditUpdate={(name) => renameModel({ modelId: props.modelId, name, language: Language.Chinese })}
+      onContentChange={(name) => renameModel({ modelId: props.modelId, name, language: Language.Chinese })}
     />
   );
 

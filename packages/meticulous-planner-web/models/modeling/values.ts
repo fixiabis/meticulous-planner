@@ -34,8 +34,9 @@ export enum Stereotype {
   ReadModel = 'read-model',
   DomainService = 'domain-service',
   Actor = 'actor',
-  Application = 'application',
   Enumeration = 'enumeration',
+
+  Application = 'application',
 }
 
 export enum Multiplicity {

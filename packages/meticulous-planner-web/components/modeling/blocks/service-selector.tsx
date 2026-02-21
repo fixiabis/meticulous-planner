@@ -43,14 +43,14 @@ export function ServiceSelector(props: ServiceSelectorProps) {
                 <p className="text-xs text-muted-foreground text-center">沒有找到結果</p>
               </div>
             </CommandEmpty>
-            {services.map((module) => {
+            {services.map((service) => {
               return (
                 <CommandItem
-                  key={String(module.id)}
-                  value={String(module.id)}
-                  onSelect={() => props.onChange?.(module.id)}
+                  key={String(service.id)}
+                  value={String(service.id)}
+                  onSelect={() => props.onChange?.(service.id)}
                 >
-                  {module.descriptions[Language.Chinese]?.name}
+                  {service.descriptions[Language.Chinese]?.name}
                 </CommandItem>
               );
             })}

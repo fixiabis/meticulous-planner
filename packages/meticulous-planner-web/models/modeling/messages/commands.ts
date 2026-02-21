@@ -13,6 +13,9 @@ import {
 } from '../values';
 
 export enum ModelingCommandType {
+  // System
+  AddSystem = 'add-system',
+  RenameSystem = 'rename-system',
   // Service
   AddService = 'add-service',
   RenameService = 'rename-service',
@@ -49,6 +52,21 @@ export enum ModelingCommandType {
   RenameModelTypeParameter = 'rename-model-type-parameter',
   EditModelTypeParameterConstraintType = 'edit-model-type-parameter-constraint-type',
 }
+
+// System
+
+export type AddSystem = {
+  readonly type: ModelingCommandType.AddSystem;
+  readonly name: string;
+  readonly language: Language;
+};
+
+export type RenameSystem = {
+  readonly type: ModelingCommandType.RenameSystem;
+  readonly systemId: SystemId;
+  readonly name: string;
+  readonly language: Language;
+};
 
 // Service
 

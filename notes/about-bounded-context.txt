@@ -13,7 +13,7 @@ subdomain / services
 bounded-context / packages
 
 domains > core-domain/subdomain > bounded-context > model
-systems > sub-system > units (containers in c4) > components
+systems > sub-systems > services (containers in c4) > components
 
 sub-system/subdomain (type: 整合端（web, api, ...）、核心、支援、基底)
 bounded-contexts/units (type: 核心業務、對外接口（api, sdk）、應用程式、操作介面 (web, mobile, desktop, ...))

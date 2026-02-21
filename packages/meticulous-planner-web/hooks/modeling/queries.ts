@@ -15,6 +15,17 @@ export function useModel(modelId: ModelId | null) {
   return { model: model ?? null, isLoading };
 }
 
+export function useSystems() {
+  const modelingService = useModelingService();
+
+  const { data: systems, isLoading } = useQuery({
+    queryKey: ['systems'],
+    queryFn: () => modelingService.getSystems({ type: ModelingQueryType.GetSystems }),
+  });
+
+  return { systems: systems ?? [], isLoading };
+}
+
 export function useSystemModels(systemId: SystemId | null) {
   const modelingService = useModelingService();
 
