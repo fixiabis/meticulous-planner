@@ -12,6 +12,7 @@ import {
 import {
   useEditModelGeneralizationType,
   useEditModelStereotype,
+  useMoveModelToService,
   useRenameModel,
 } from '@/hooks/modeling/model-commands';
 import {
@@ -54,6 +55,7 @@ export function EditModelForm(props: EditModelFormProps) {
   const { renameModel } = useRenameModel();
   const { editModelStereotype } = useEditModelStereotype();
   const { editModelGeneralizationType } = useEditModelGeneralizationType();
+  const { moveModelToService } = useMoveModelToService();
   const { addModelTypeParameter } = useAddModelTypeParameter();
   const { removeModelTypeParameter } = useRemoveModelTypeParameter();
   const { removeAllModelTypeParameters } = useRemoveAllModelTypeParameters();
@@ -95,7 +97,13 @@ export function EditModelForm(props: EditModelFormProps) {
     <div className={cn('p-4 space-y-1', props.className)}>
       <h1 className="text-2xl font-bold mb-2">{name}</h1>
       <p>
-        是<ServiceSelector systemId={model.systemId} language={Language.Chinese} value={model.serviceId} />
+        是
+        <ServiceSelector
+          systemId={model.systemId}
+          language={Language.Chinese}
+          value={model.serviceId}
+          onChange={(serviceId) => moveModelToService({ modelId: props.modelId, serviceId })}
+        />
         中的
         <StereotypeSelect
           language={Language.Chinese}

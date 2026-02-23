@@ -24,6 +24,7 @@ export enum ModelingCommandType {
   RenameModel = 'rename-model',
   EditModelStereotype = 'edit-model-stereotype',
   EditModelGeneralizationType = 'edit-model-generalization-type',
+  MoveModelToService = 'move-model-to-service',
   // Model - Attribute
   AddModelAttribute = 'add-model-attribute',
   RemoveModelAttribute = 'remove-model-attribute',
@@ -111,6 +112,12 @@ export type EditModelGeneralizationType = {
   readonly type: ModelingCommandType.EditModelGeneralizationType;
   readonly modelId: ModelId;
   readonly generalizationType: TypeReference | null;
+};
+
+export type MoveModelToService = {
+  readonly type: ModelingCommandType.MoveModelToService;
+  readonly modelId: ModelId;
+  readonly serviceId: ServiceId | null;
 };
 
 // Model - Attribute

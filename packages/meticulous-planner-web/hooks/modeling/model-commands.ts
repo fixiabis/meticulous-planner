@@ -64,3 +64,16 @@ export function useEditModelGeneralizationType() {
 
   return { editModelGeneralizationType, isPending };
 }
+
+export function useMoveModelToService() {
+  const modelingService = useModelingService();
+  const queryClient = useQueryClient();
+
+  const { mutateAsync: moveModelToService, isPending } = useMutation({
+    mutationFn: (params: { modelId: ModelId; serviceId: ServiceId | null }) =>
+      modelingService.moveModelToService({ type: ModelingCommandType.MoveModelToService, ...params }),
+    onSuccess: (model) => invalidateModel(queryClient, model.id, model.systemId),
+  });
+
+  return { moveModelToService, isPending };
+}

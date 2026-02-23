@@ -17,6 +17,7 @@ import {
   EditModelOperationReturnType,
   EditModelStereotype,
   EditModelTypeParameterConstraintType,
+  MoveModelToService,
   RemoveAllModelAttributes,
   RemoveAllModelOperationParameters,
   RemoveAllModelOperations,
@@ -63,6 +64,7 @@ export interface ModelingService {
   renameModel(command: RenameModel): Promise<Model>;
   editModelStereotype(command: EditModelStereotype): Promise<Model>;
   editModelGeneralizationType(command: EditModelGeneralizationType): Promise<Model>;
+  moveModelToService(command: MoveModelToService): Promise<Model>;
   // Model - Attribute
   addModelAttribute(command: AddModelAttribute): Promise<Model>;
   removeModelAttribute(command: RemoveModelAttribute): Promise<Model>;
@@ -227,6 +229,10 @@ const useModelingStore = create<ModelingStore>((set, get) => ({
 
   async editModelGeneralizationType(command) {
     return updateModel(get, set, command.modelId, (m) => m.editGeneralizationType(command.generalizationType));
+  },
+
+  async moveModelToService(command) {
+    return updateModel(get, set, command.modelId, (m) => m.moveToService(command.serviceId));
   },
 
   // Model - Attribute

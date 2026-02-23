@@ -86,6 +86,10 @@ export class Model implements ModelProps {
     return this.withProps({ generalizationType });
   }
 
+  moveToService(serviceId: ServiceId | null) {
+    return this.withProps({ serviceId });
+  }
+
   private withAttribute(attributeId: AttributeId, edit: (attr: Attribute) => Attribute) {
     return this.withProps({
       attributes: this.attributes.map((attr) => (attr.id === attributeId ? edit(attr) : attr)),
