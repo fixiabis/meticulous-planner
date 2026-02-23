@@ -1,6 +1,7 @@
 import { TypeReference } from '../type-reference';
 import {
   AttributeId,
+  EnumerationItemId,
   Language,
   ModelId,
   ServiceId,
@@ -46,6 +47,12 @@ export enum ModelingCommandType {
   RenameModelOperationParameter = 'rename-model-operation-parameter',
   EditModelOperationParameterType = 'edit-model-operation-parameter-type',
   EditModelOperationParameterMultiplicity = 'edit-model-operation-parameter-multiplicity',
+  // Model - EnumerationItem
+  AddModelEnumerationItem = 'add-model-enumeration-item',
+  RemoveModelEnumerationItem = 'remove-model-enumeration-item',
+  RemoveAllModelEnumerationItems = 'remove-all-model-enumeration-items',
+  RenameModelEnumerationItem = 'rename-model-enumeration-item',
+  EditModelEnumerationItemCode = 'edit-model-enumeration-item-code',
   // Model - TypeParameter
   AddModelTypeParameter = 'add-model-type-parameter',
   RemoveModelTypeParameter = 'remove-model-type-parameter',
@@ -279,6 +286,39 @@ export type EditModelTypeParameterConstraintType = {
   readonly constraintType: TypeReference | null;
 };
 
+// Model - EnumerationItem
+
+export type AddModelEnumerationItem = {
+  readonly type: ModelingCommandType.AddModelEnumerationItem;
+  readonly modelId: ModelId;
+};
+
+export type RemoveModelEnumerationItem = {
+  readonly type: ModelingCommandType.RemoveModelEnumerationItem;
+  readonly modelId: ModelId;
+  readonly enumerationItemId: EnumerationItemId;
+};
+
+export type RemoveAllModelEnumerationItems = {
+  readonly type: ModelingCommandType.RemoveAllModelEnumerationItems;
+  readonly modelId: ModelId;
+};
+
+export type RenameModelEnumerationItem = {
+  readonly type: ModelingCommandType.RenameModelEnumerationItem;
+  readonly modelId: ModelId;
+  readonly enumerationItemId: EnumerationItemId;
+  readonly name: string;
+  readonly language: Language;
+};
+
+export type EditModelEnumerationItemCode = {
+  readonly type: ModelingCommandType.EditModelEnumerationItemCode;
+  readonly modelId: ModelId;
+  readonly enumerationItemId: EnumerationItemId;
+  readonly code: string;
+};
+
 export type ModelingCommand =
   | AddService
   | RenameService
@@ -308,4 +348,9 @@ export type ModelingCommand =
   | RemoveModelTypeParameter
   | RemoveAllModelTypeParameters
   | RenameModelTypeParameter
-  | EditModelTypeParameterConstraintType;
+  | EditModelTypeParameterConstraintType
+  | AddModelEnumerationItem
+  | RemoveModelEnumerationItem
+  | RemoveAllModelEnumerationItems
+  | RenameModelEnumerationItem
+  | EditModelEnumerationItemCode;

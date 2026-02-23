@@ -30,7 +30,7 @@ export function ServiceSelector(props: ServiceSelectorProps) {
       }}
     >
       <PopoverTrigger>
-        <span className={cn('cursor-pointer underline', props.className)}>
+        <span className={cn('cursor-pointer underline', !selectedService && 'opacity-50', props.className)}>
           {selectedService ? selectedService.descriptions[Language.Chinese]?.name : '某服務'}
         </span>
       </PopoverTrigger>

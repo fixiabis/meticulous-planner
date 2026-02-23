@@ -44,6 +44,13 @@ import {
   useRenameModelOperation,
   useRenameModelOperationParameter,
 } from '@/hooks/modeling/model-operation-commands';
+import {
+  useAddModelEnumerationItem,
+  useEditModelEnumerationItemCode,
+  useRemoveAllModelEnumerationItems,
+  useRemoveModelEnumerationItem,
+  useRenameModelEnumerationItem,
+} from '@/hooks/modeling/model-enumeration-item-commands';
 
 export type EditModelFormProps = {
   className?: string;
@@ -79,6 +86,11 @@ export function EditModelForm(props: EditModelFormProps) {
   const { renameModelOperationParameter } = useRenameModelOperationParameter();
   const { editModelOperationParameterType } = useEditModelOperationParameterType();
   const { editModelOperationParameterMultiplicity } = useEditModelOperationParameterMultiplicity();
+  const { addModelEnumerationItem } = useAddModelEnumerationItem();
+  const { removeModelEnumerationItem } = useRemoveModelEnumerationItem();
+  const { removeAllModelEnumerationItems } = useRemoveAllModelEnumerationItems();
+  const { renameModelEnumerationItem } = useRenameModelEnumerationItem();
+  const { editModelEnumerationItemCode } = useEditModelEnumerationItemCode();
 
   if (!model) {
     return <div className={cn('p-4 space-y-1', props.className)}></div>;
@@ -89,7 +101,11 @@ export function EditModelForm(props: EditModelFormProps) {
       className={cn({ 'inline-block min-w-24': !model.descriptions[Language.Chinese]?.name })}
       content={model.descriptions[Language.Chinese]?.name || ''}
       placeholder="模型名稱"
-      onContentChange={(name) => renameModel({ modelId: props.modelId, name, language: Language.Chinese })}
+      onContentChange={(name) => {
+        if (name.trim() !== '') {
+          renameModel({ modelId: props.modelId, name, language: Language.Chinese });
+        }
+      }}
     />
   );
 
@@ -155,15 +171,15 @@ export function EditModelForm(props: EditModelFormProps) {
           valueStringify={String}
         />
       </p>
-      {model.typeParameters.length > 0 && <p>由於用途廣泛，使用時需要以下資訊：</p>}
+      {model.typeParameters.length > 0 && <p>由於用途廣泛，使用時需要以下模型資訊：</p>}
       {model.typeParameters.length > 0 && (
         <ul className="list-disc list-inside pl-6">
           {model.typeParameters.map((typeParameter) => (
             <li key={typeParameter.id} className="relative group/type-parameter">
               <ContentEditable
-                className={cn({ 'inline-block min-w-16': !typeParameter.descriptions[Language.Chinese]?.name })}
+                className={cn({ 'inline-block min-w-24': !typeParameter.descriptions[Language.Chinese]?.name })}
                 content={typeParameter.descriptions[Language.Chinese]?.name || ''}
-                placeholder="資訊名稱"
+                placeholder="模型資訊名稱"
                 onContentChange={(name) =>
                   renameModelTypeParameter({
                     modelId: props.modelId,
@@ -205,9 +221,9 @@ export function EditModelForm(props: EditModelFormProps) {
               )}
               <DropdownMenu
                 items={[
-                  { label: '新增', onSelect: () => addModelTypeParameter({ modelId: props.modelId }) },
+                  { label: '新增模型資訊', onSelect: () => addModelTypeParameter({ modelId: props.modelId }) },
                   {
-                    label: '移除',
+                    label: '移除模型資訊',
                     onSelect: () =>
                       removeModelTypeParameter({ modelId: props.modelId, typeParameterId: typeParameter.id }),
                   },
@@ -461,6 +477,78 @@ export function EditModelForm(props: EditModelFormProps) {
                   ))}
                 </ul>
               )}
+            </li>
+          ))}
+        </ul>
+      )}
+      {model.stereotype === Stereotype.Enumeration && (
+        <p>
+          <Select
+            value={model.enumerationItems.length > 0}
+            onChange={(hasEnumerationItem) => {
+              if (hasEnumerationItem) {
+                addModelEnumerationItem({ modelId: props.modelId });
+              } else {
+                removeAllModelEnumerationItems({ modelId: props.modelId });
+              }
+            }}
+            items={[
+              { label: '暫無任何種類', value: false },
+              { label: '分為以下種類：', value: true },
+            ]}
+            valueStringify={String}
+          />
+        </p>
+      )}
+      {model.stereotype === Stereotype.Enumeration && model.enumerationItems.length > 0 && (
+        <ul className="list-disc list-inside pl-6">
+          {model.enumerationItems.map((enumerationItem) => (
+            <li key={enumerationItem.id} className="relative group/enumeration-item">
+              <ContentEditable
+                className={cn({ 'inline-block min-w-16': !enumerationItem.descriptions[Language.Chinese]?.name })}
+                content={enumerationItem.descriptions[Language.Chinese]?.name || ''}
+                placeholder="種類名稱"
+                onContentChange={(name) =>
+                  renameModelEnumerationItem({
+                    modelId: props.modelId,
+                    enumerationItemId: enumerationItem.id,
+                    name,
+                    language: Language.Chinese,
+                  })
+                }
+              />
+              ：使用代號「
+              <ContentEditable
+                className={cn({ 'inline-block min-w-8': !enumerationItem.code })}
+                content={enumerationItem.code}
+                placeholder="代號"
+                onContentChange={(code) =>
+                  editModelEnumerationItemCode({
+                    modelId: props.modelId,
+                    enumerationItemId: enumerationItem.id,
+                    code,
+                  })
+                }
+              />
+              」
+              <DropdownMenu
+                items={[
+                  { label: '新增種類', onSelect: () => addModelEnumerationItem({ modelId: props.modelId }) },
+                  {
+                    label: '移除種類',
+                    onSelect: () =>
+                      removeModelEnumerationItem({
+                        modelId: props.modelId,
+                        enumerationItemId: enumerationItem.id,
+                      }),
+                  },
+                ]}
+              >
+                <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/enumeration-item:opacity-100">
+                  {' '}
+                  ...
+                </span>
+              </DropdownMenu>
             </li>
           ))}
         </ul>

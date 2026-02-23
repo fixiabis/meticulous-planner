@@ -3,6 +3,7 @@ import { Description } from '@/models/modeling/description';
 import {
   AddModel,
   AddModelAttribute,
+  AddModelEnumerationItem,
   AddModelOperation,
   AddModelOperationParameter,
   AddModelTypeParameter,
@@ -10,6 +11,7 @@ import {
   AddSystem,
   EditModelAttributeMultiplicity,
   EditModelAttributeType,
+  EditModelEnumerationItemCode,
   EditModelGeneralizationType,
   EditModelOperationMultiplicity,
   EditModelOperationParameterMultiplicity,
@@ -19,15 +21,18 @@ import {
   EditModelTypeParameterConstraintType,
   MoveModelToService,
   RemoveAllModelAttributes,
+  RemoveAllModelEnumerationItems,
   RemoveAllModelOperationParameters,
   RemoveAllModelOperations,
   RemoveAllModelTypeParameters,
   RemoveModelAttribute,
+  RemoveModelEnumerationItem,
   RemoveModelOperation,
   RemoveModelOperationParameter,
   RemoveModelTypeParameter,
   RenameModel,
   RenameModelAttribute,
+  RenameModelEnumerationItem,
   RenameModelOperation,
   RenameModelOperationParameter,
   RenameModelTypeParameter,
@@ -40,6 +45,7 @@ import { Service } from '@/models/modeling/service';
 import { System } from '@/models/modeling/system';
 import {
   AttributeId,
+  EnumerationItemId,
   ModelId,
   OperationId,
   ParameterId,
@@ -92,6 +98,12 @@ export interface ModelingService {
   removeAllModelTypeParameters(command: RemoveAllModelTypeParameters): Promise<Model>;
   renameModelTypeParameter(command: RenameModelTypeParameter): Promise<Model>;
   editModelTypeParameterConstraintType(command: EditModelTypeParameterConstraintType): Promise<Model>;
+  // Model - EnumerationItem
+  addModelEnumerationItem(command: AddModelEnumerationItem): Promise<Model>;
+  removeModelEnumerationItem(command: RemoveModelEnumerationItem): Promise<Model>;
+  removeAllModelEnumerationItems(command: RemoveAllModelEnumerationItems): Promise<Model>;
+  renameModelEnumerationItem(command: RenameModelEnumerationItem): Promise<Model>;
+  editModelEnumerationItemCode(command: EditModelEnumerationItemCode): Promise<Model>;
 }
 
 export type ModelingStore = ModelingService & {
@@ -358,6 +370,34 @@ const useModelingStore = create<ModelingStore>((set, get) => ({
   async editModelTypeParameterConstraintType(command) {
     return updateModel(get, set, command.modelId, (m) =>
       m.editTypeParameterConstraintType(command.typeParameterId, command.constraintType),
+    );
+  },
+
+  // Model - EnumerationItem
+
+  async addModelEnumerationItem(command) {
+    return updateModel(get, set, command.modelId, (m) =>
+      m.addEnumerationItem(EnumerationItemId(crypto.randomUUID())),
+    );
+  },
+
+  async removeModelEnumerationItem(command) {
+    return updateModel(get, set, command.modelId, (m) => m.removeEnumerationItem(command.enumerationItemId));
+  },
+
+  async removeAllModelEnumerationItems(command) {
+    return updateModel(get, set, command.modelId, (m) => m.removeAllEnumerationItems());
+  },
+
+  async renameModelEnumerationItem(command) {
+    return updateModel(get, set, command.modelId, (m) =>
+      m.renameEnumerationItem(command.enumerationItemId, command.name, command.language),
+    );
+  },
+
+  async editModelEnumerationItemCode(command) {
+    return updateModel(get, set, command.modelId, (m) =>
+      m.editEnumerationItemCode(command.enumerationItemId, command.code),
     );
   },
 }));

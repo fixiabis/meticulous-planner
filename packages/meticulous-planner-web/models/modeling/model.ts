@@ -6,6 +6,7 @@ import { TypeParameter } from './type-parameter';
 import { TypeReference } from './type-reference';
 import {
   AttributeId,
+  EnumerationItemId,
   Language,
   ModelId,
   ServiceId,
@@ -26,7 +27,7 @@ export type ModelProps = {
   readonly attributes: readonly Attribute[];
   readonly operations: readonly Operation[];
   readonly typeParameters: readonly TypeParameter[];
-  readonly enumerationItem: readonly EnumerationItem[];
+  readonly enumerationItems: readonly EnumerationItem[];
   readonly descriptions: Readonly<Partial<Record<Language, Description>>>;
 };
 
@@ -43,7 +44,7 @@ export class Model implements ModelProps {
   readonly attributes: readonly Attribute[];
   readonly operations: readonly Operation[];
   readonly typeParameters: readonly TypeParameter[];
-  readonly enumerationItem: readonly EnumerationItem[];
+  readonly enumerationItems: readonly EnumerationItem[];
   readonly descriptions: Readonly<Partial<Record<Language, Description>>>;
 
   constructor(props: ModelProps) {
@@ -55,7 +56,7 @@ export class Model implements ModelProps {
     this.attributes = props.attributes;
     this.operations = props.operations;
     this.typeParameters = props.typeParameters;
-    this.enumerationItem = props.enumerationItem;
+    this.enumerationItems = props.enumerationItems;
     this.descriptions = props.descriptions;
   }
 
@@ -69,7 +70,7 @@ export class Model implements ModelProps {
       attributes: props.attributes ?? [],
       operations: props.operations ?? [],
       typeParameters: props.typeParameters ?? [],
-      enumerationItem: props.enumerationItem ?? [],
+      enumerationItems: props.enumerationItems ?? [],
       descriptions: props.descriptions ?? {},
     });
   }
@@ -200,6 +201,39 @@ export class Model implements ModelProps {
 
   editTypeParameterConstraintType(typeParameterId: TypeParameterId, type: TypeReference | null) {
     return this.withTypeParameter(typeParameterId, (tp) => tp.editConstraintType(type));
+  }
+
+  private withEnumerationItem(
+    enumerationItemId: EnumerationItemId,
+    edit: (item: EnumerationItem) => EnumerationItem,
+  ) {
+    return this.withProps({
+      enumerationItems: this.enumerationItems.map((item) => (item.id === enumerationItemId ? edit(item) : item)),
+    });
+  }
+
+  addEnumerationItem(enumerationItemId: EnumerationItemId) {
+    return this.withProps({
+      enumerationItems: [...this.enumerationItems, EnumerationItem.create({ id: enumerationItemId })],
+    });
+  }
+
+  removeEnumerationItem(enumerationItemId: EnumerationItemId) {
+    return this.withProps({
+      enumerationItems: this.enumerationItems.filter((item) => item.id !== enumerationItemId),
+    });
+  }
+
+  removeAllEnumerationItems() {
+    return this.withProps({ enumerationItems: [] });
+  }
+
+  renameEnumerationItem(enumerationItemId: EnumerationItemId, name: string, language: Language) {
+    return this.withEnumerationItem(enumerationItemId, (item) => item.rename(name, language));
+  }
+
+  editEnumerationItemCode(enumerationItemId: EnumerationItemId, code: string) {
+    return this.withEnumerationItem(enumerationItemId, (item) => item.editCode(code));
   }
 
   rename(name: string, language: Language) {
