@@ -52,12 +52,12 @@ import {
   useRenameModelEnumerationItem,
 } from '@/hooks/modeling/model-enumeration-item-commands';
 
-export type EditModelFormProps = {
+export type ModelEditorProps = {
   className?: string;
   modelId: ModelId;
 };
 
-export function EditModelForm(props: EditModelFormProps) {
+export function ModelEditor(props: ModelEditorProps) {
   const { model } = useModel(props.modelId);
   const { renameModel } = useRenameModel();
   const { editModelStereotype } = useEditModelStereotype();
@@ -185,7 +185,7 @@ export function EditModelForm(props: EditModelFormProps) {
         </p>
       )}
       {model.typeParameters.length > 0 && (
-        <ul className="list-disc list-inside pl-6">
+        <ul className="list-disc list-outside pl-6">
           {model.typeParameters.map((typeParameter) => (
             <li key={typeParameter.id} className="relative group/type-parameter">
               <ContentEditable
@@ -274,7 +274,7 @@ export function EditModelForm(props: EditModelFormProps) {
         </DropdownMenu>
       </p>
       {model.attributes.length > 0 && (
-        <ul className="list-disc list-inside pl-6">
+        <ul className="list-disc list-outside pl-6">
           {model.attributes.map((attribute) => (
             <li key={attribute.id} className="relative group/attribute">
               <ContentEditable
@@ -362,10 +362,10 @@ export function EditModelForm(props: EditModelFormProps) {
         </DropdownMenu>
       </p>
       {model.operations.length > 0 && (
-        <ul className="list-disc list-inside pl-6">
+        <ul className="list-disc list-outside pl-6">
           {model.operations.map((operation) => (
             <li key={operation.id}>
-              <span className="relative group/operation">
+              <p className="relative group/operation">
                 <ContentEditable
                   className={cn({ 'inline-block min-w-16': !operation.descriptions[Language.Chinese]?.name })}
                   content={operation.descriptions[Language.Chinese]?.name || ''}
@@ -427,9 +427,9 @@ export function EditModelForm(props: EditModelFormProps) {
                     ...
                   </span>
                 </DropdownMenu>
-              </span>
+              </p>
               {operation.parameters.length > 0 && (
-                <ul className="list-[circle] list-inside pl-6">
+                <ul className="list-[circle] list-outside pl-6">
                   {operation.parameters.map((parameter) => (
                     <li key={parameter.id} className="relative group/parameter">
                       <ContentEditable
@@ -502,6 +502,38 @@ export function EditModelForm(props: EditModelFormProps) {
                   ))}
                 </ul>
               )}
+              <p>
+                <Select
+                  value={true}
+                  onChange={(hasRule) => {
+                    if (hasRule) {
+                      console.log('TODO: show operation rule editor');
+                    } else {
+                    }
+                  }}
+                  items={[
+                    { label: '操作時，暫無任何限制', value: false },
+                    { label: '操作時，需要符合以下規則：', value: true },
+                  ]}
+                  valueStringify={String}
+                />
+              </p>
+              <p>
+                <Select
+                  value={true}
+                  onChange={(hasEffect) => {
+                    if (hasEffect) {
+                      console.log('TODO: show operation effect editor');
+                    } else {
+                    }
+                  }}
+                  items={[
+                    { label: '操作後，暫不會使其造成任何改變', value: false },
+                    { label: '操作後，會使其產生以下改變：', value: true },
+                  ]}
+                  valueStringify={String}
+                />
+              </p>
             </li>
           ))}
         </ul>
@@ -534,7 +566,7 @@ export function EditModelForm(props: EditModelFormProps) {
         </p>
       )}
       {model.stereotype === Stereotype.Enumeration && model.enumerationItems.length > 0 && (
-        <ul className="list-disc list-inside pl-6">
+        <ul className="list-disc list-outside pl-6">
           {model.enumerationItems.map((enumerationItem) => (
             <li key={enumerationItem.id} className="relative group/enumeration-item">
               <ContentEditable

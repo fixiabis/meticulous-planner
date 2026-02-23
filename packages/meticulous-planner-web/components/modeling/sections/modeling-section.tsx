@@ -1,6 +1,6 @@
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { cn } from '@/lib/utils';
-import { EditModelForm } from '../blocks/edit-model-form';
+import { ModelEditor } from '../blocks/model-editor';
 import { CodeViewer } from '../elements/code-viewer';
 import { ModelId } from '@/models/modeling/values';
 
@@ -13,7 +13,7 @@ export function ModelingSection(props: ModelingSectionProps) {
     <div className={cn('w-full h-full', props.className)}>
       <ResizablePanelGroup className="w-full h-full">
         <ResizablePanel defaultSize={100}>
-          <EditModelForm modelId={ModelId("sample")} />
+          <ModelEditor modelId={ModelId("sample")} />
         </ResizablePanel>
         <ResizableHandle />
         <ResizablePanel defaultSize={0}>
