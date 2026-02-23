@@ -42,7 +42,7 @@ export function TypeReferenceSelector(props: TypeReferenceSelectorProps) {
       <PopoverTrigger>
         <span className={cn('cursor-pointer underline', { 'opacity-50': !label })}>{label || '某模型'}</span>
       </PopoverTrigger>
-      <PopoverContent className="p-0 w-36">
+      <PopoverContent className="p-0 w-72">
         <Command className="space-y-2">
           <CommandInput placeholder="搜尋" className="h-9" onValueChange={setSearchText} value={searchText} />
           <CommandList>
@@ -51,7 +51,7 @@ export function TypeReferenceSelector(props: TypeReferenceSelectorProps) {
                 <p className="text-xs text-muted-foreground text-center">沒有找到結果</p>
               </div>
             </CommandEmpty>
-            {model && (
+            {model && model.typeParameters.length > 0 && (
               <CommandGroup heading={model.descriptions[props.language]?.name}>
                 {model.typeParameters.map((typeParameter) => (
                   <CommandItem
@@ -70,21 +70,22 @@ export function TypeReferenceSelector(props: TypeReferenceSelectorProps) {
                 ))}
               </CommandGroup>
             )}
-            {modelsOfServices.entries().map(([serviceId, items]) => {
-              const modelService = services.find((service) => service.id === serviceId);
+            {modelsOfServices
+              .entries()
+              .map(([serviceId, modelsOfService]) => {
+                const service = services.find((service) => service.id === serviceId);
 
-              if (!modelService) {
-                return;
-              }
+                if (!service) {
+                  return;
+                }
 
-              return (
-                items && (
-                  <CommandGroup key={serviceId} heading={modelService.descriptions[props.language]?.name}>
-                    {items.map((modelOfService) => {
-                      return (
+                return (
+                  modelsOfService && (
+                    <CommandGroup key={serviceId} heading={service.descriptions[props.language]?.name}>
+                      {modelsOfService.map((modelOfService) => (
                         <CommandItem
                           key={String(modelOfService.id)}
-                          value={`${modelOfService.descriptions[props.language]?.name}/${modelOfService.id}/${modelService.descriptions[props.language]?.name}`}
+                          value={`${modelOfService.descriptions[props.language]?.name}/${modelOfService.id}/${service.descriptions[props.language]?.name}`}
                           onSelect={() => props.onChange?.(TypeReference.createModel(modelOfService.id))}
                           data-checked={
                             props.value?.type === TypeReferenceType.Model && props.value?.modelId === modelOfService.id
@@ -93,16 +94,16 @@ export function TypeReferenceSelector(props: TypeReferenceSelectorProps) {
                           }
                         >
                           {modelOfService.descriptions[props.language]?.name}
-                          {modelOfService.serviceId !== model?.serviceId
-                            ? ` (${modelService.descriptions[props.language]?.name})`
+                          {!service.isBase && modelOfService.serviceId !== model?.serviceId
+                            ? ` (${service.descriptions[props.language]?.name})`
                             : ''}
                         </CommandItem>
-                      );
-                    })}
-                  </CommandGroup>
-                )
-              );
-            })}
+                      ))}
+                    </CommandGroup>
+                  )
+                );
+              })
+              .toArray()}
           </CommandList>
         </Command>
       </PopoverContent>

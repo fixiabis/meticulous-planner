@@ -33,3 +33,8 @@ bounded-contexts/units (type: 核心業務、對外接口（api, sdk）、應用
 能對其進行以下操作:
 
 將 XX 
+
+建立系統
+建立服務
+
+服務能受理以下指令: ...

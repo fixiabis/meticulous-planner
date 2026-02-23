@@ -39,7 +39,7 @@ export class Attribute implements AttributeProps {
     return new Attribute({ ...this, ...props });
   }
 
-  editType(type: TypeReference) {
+  editType(type: TypeReference | null) {
     return this.withProps({ type });
   }
 

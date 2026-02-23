@@ -108,7 +108,7 @@ export class Model implements ModelProps {
     return this.withAttribute(attributeId, (attr) => attr.rename(name, language));
   }
 
-  editAttributeType(attributeId: AttributeId, type: TypeReference) {
+  editAttributeType(attributeId: AttributeId, type: TypeReference | null) {
     return this.withAttribute(attributeId, (attr) => attr.editType(type));
   }
 

@@ -31,11 +31,11 @@ export function ServiceSelector(props: ServiceSelectorProps) {
     >
       <PopoverTrigger>
         <span className={cn('cursor-pointer underline', props.className)}>
-          {selectedService ? selectedService.descriptions[Language.Chinese]?.name : '某功能'}
+          {selectedService ? selectedService.descriptions[Language.Chinese]?.name : '某服務'}
         </span>
       </PopoverTrigger>
-      <PopoverContent className="p-0 w-36">
-        <Command>
+      <PopoverContent className="p-0 w-48">
+        <Command className="space-y-2">
           <CommandInput placeholder="搜尋" className="h-9" onValueChange={setSearchText} value={searchText} />
           <CommandList>
             <CommandEmpty>

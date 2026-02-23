@@ -5,7 +5,12 @@ import { TypeParameter } from './type-parameter';
 import { Language, ModelId, ServiceId, SystemId, Stereotype, TypeParameterId } from './values';
 
 export function buildBaseService(systemId: SystemId) {
-  return Service.create({ id: ServiceId('base'), systemId, isBase: true });
+  return Service.create({
+    id: ServiceId('base'),
+    systemId,
+    isBase: true,
+    descriptions: { [Language.Chinese]: Description.create({ name: '基礎服務', language: Language.Chinese }) },
+  });
 }
 
 export function buildBaseModels(systemId: SystemId) {
@@ -73,7 +78,7 @@ export function buildBaseModels(systemId: SystemId) {
         TypeParameter.create({
           id: TypeParameterId('base-awaitable-item'),
           descriptions: {
-            [Language.Chinese]: Description.create({ name: '等待的模型', language: Language.Chinese }),
+            [Language.Chinese]: Description.create({ name: '等待的', language: Language.Chinese }),
           },
         }),
       ],

@@ -1,4 +1,4 @@
-import { buildBaseModels } from '@/models/modeling/base';
+import { buildBaseModels, buildBaseService } from '@/models/modeling/base';
 import { Description } from '@/models/modeling/description';
 import {
   AddModel,
@@ -37,7 +37,15 @@ import { GetModel, GetSystemModels, GetSystems, GetSystemServices } from '@/mode
 import { Model } from '@/models/modeling/model';
 import { Service } from '@/models/modeling/service';
 import { System } from '@/models/modeling/system';
-import { ModelId, ServiceId, SystemId } from '@/models/modeling/values';
+import {
+  AttributeId,
+  ModelId,
+  OperationId,
+  ParameterId,
+  ServiceId,
+  SystemId,
+  TypeParameterId,
+} from '@/models/modeling/values';
 import { create } from 'zustand';
 
 export interface ModelingService {
@@ -113,11 +121,15 @@ const useModelingStore = create<ModelingStore>((set, get) => ({
   async getSystemServices(query) {
     return get()
       .services.filter((service) => service.systemId === query.systemId)
-      .concat([Service.create({ id: ServiceId('base'), systemId: query.systemId, isBase: true })]);
+      .concat(buildBaseService(query.systemId));
   },
 
   async getModel(query) {
-    const model = get().models.find((model) => model.id === query.modelId);
+    const baseModels = buildBaseModels(SystemId('unknown'));
+
+    const model = get()
+      .models.concat(baseModels)
+      .find((model) => model.id === query.modelId);
 
     if (!model) {
       throw new Error('Model not found');
@@ -220,7 +232,7 @@ const useModelingStore = create<ModelingStore>((set, get) => ({
   // Model - Attribute
 
   async addModelAttribute(command) {
-    return updateModel(get, set, command.modelId, (m) => m.addAttribute(command.attributeId));
+    return updateModel(get, set, command.modelId, (m) => m.addAttribute(AttributeId(crypto.randomUUID())));
   },
 
   async removeModelAttribute(command) {
@@ -252,7 +264,7 @@ const useModelingStore = create<ModelingStore>((set, get) => ({
   // Model - Operation
 
   async addModelOperation(command) {
-    return updateModel(get, set, command.modelId, (m) => m.addOperation(command.operationId));
+    return updateModel(get, set, command.modelId, (m) => m.addOperation(OperationId(crypto.randomUUID())));
   },
 
   async removeModelOperation(command) {
@@ -285,7 +297,7 @@ const useModelingStore = create<ModelingStore>((set, get) => ({
 
   async addModelOperationParameter(command) {
     return updateModel(get, set, command.modelId, (m) =>
-      m.addOperationParameter(command.operationId, command.parameterId),
+      m.addOperationParameter(command.operationId, ParameterId(crypto.randomUUID())),
     );
   },
 
@@ -320,7 +332,7 @@ const useModelingStore = create<ModelingStore>((set, get) => ({
   // Model - TypeParameter
 
   async addModelTypeParameter(command) {
-    return updateModel(get, set, command.modelId, (m) => m.addTypeParameter(command.typeParameterId));
+    return updateModel(get, set, command.modelId, (m) => m.addTypeParameter(TypeParameterId(crypto.randomUUID())));
   },
 
   async removeModelTypeParameter(command) {

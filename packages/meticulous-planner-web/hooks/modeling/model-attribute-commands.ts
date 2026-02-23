@@ -16,7 +16,7 @@ export function useAddModelAttribute() {
   const queryClient = useQueryClient();
 
   const { mutateAsync: addModelAttribute, isPending } = useMutation({
-    mutationFn: (params: { modelId: ModelId; attributeId: AttributeId }) =>
+    mutationFn: (params: { modelId: ModelId }) =>
       modelingService.addModelAttribute({ type: ModelingCommandType.AddModelAttribute, ...params }),
     onSuccess: (model) => invalidateModel(queryClient, model.id, model.systemId),
   });
@@ -68,7 +68,7 @@ export function useEditModelAttributeType() {
   const queryClient = useQueryClient();
 
   const { mutateAsync: editModelAttributeType, isPending } = useMutation({
-    mutationFn: (params: { modelId: ModelId; attributeId: AttributeId; attributeType: TypeReference }) =>
+    mutationFn: (params: { modelId: ModelId; attributeId: AttributeId; attributeType: TypeReference | null }) =>
       modelingService.editModelAttributeType({ type: ModelingCommandType.EditModelAttributeType, ...params }),
     onSuccess: (model) => invalidateModel(queryClient, model.id, model.systemId),
   });

@@ -1,4 +1,4 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select } from '@/components/base/select';
 import { Language, Stereotype } from '@/models/modeling/values';
 
 export type StereotypeSelectProps = {
@@ -10,22 +10,16 @@ export type StereotypeSelectProps = {
 
 export function StereotypeSelect(props: StereotypeSelectProps) {
   return (
-    <Select value={props.value} onValueChange={(value) => props.onChange?.(value as Stereotype)}>
-      <SelectTrigger className="inline-block shadow-none border-none p-1 py-0 -m-1 my-0 [&>.lucide-chevron-down]:hidden [font-size:inherit] cursor-pointer text-black! underline">
-        <SelectValue placeholder="某概念" />
-      </SelectTrigger>
-      <SelectContent>
-        {stereotypeItems.map((label) => (
-          <SelectItem key={label.value} value={label.value}>
-            {label.label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <Select
+      value={props.value}
+      onChange={(value) => value && props.onChange?.(value)}
+      items={items}
+      valueStringify={String}
+    ></Select>
   );
 }
 
-const stereotypeItems = [
+const items = [
   { value: Stereotype.Actor, label: '身份' },
   // { value: Stereotype.Application, label: '應用' },
   // { value: Stereotype.DomainService, label: '領域服務' },

@@ -118,7 +118,6 @@ export type EditModelGeneralizationType = {
 export type AddModelAttribute = {
   readonly type: ModelingCommandType.AddModelAttribute;
   readonly modelId: ModelId;
-  readonly attributeId: AttributeId;
 };
 
 export type RemoveModelAttribute = {
@@ -144,7 +143,7 @@ export type EditModelAttributeType = {
   readonly type: ModelingCommandType.EditModelAttributeType;
   readonly modelId: ModelId;
   readonly attributeId: AttributeId;
-  readonly attributeType: TypeReference;
+  readonly attributeType: TypeReference | null;
 };
 
 export type EditModelAttributeMultiplicity = {
@@ -159,7 +158,6 @@ export type EditModelAttributeMultiplicity = {
 export type AddModelOperation = {
   readonly type: ModelingCommandType.AddModelOperation;
   readonly modelId: ModelId;
-  readonly operationId: OperationId;
 };
 
 export type RemoveModelOperation = {
@@ -201,7 +199,6 @@ export type AddModelOperationParameter = {
   readonly type: ModelingCommandType.AddModelOperationParameter;
   readonly modelId: ModelId;
   readonly operationId: OperationId;
-  readonly parameterId: ParameterId;
 };
 
 export type RemoveModelOperationParameter = {
@@ -247,7 +244,6 @@ export type EditModelOperationParameterMultiplicity = {
 export type AddModelTypeParameter = {
   readonly type: ModelingCommandType.AddModelTypeParameter;
   readonly modelId: ModelId;
-  readonly typeParameterId: TypeParameterId;
 };
 
 export type RemoveModelTypeParameter = {

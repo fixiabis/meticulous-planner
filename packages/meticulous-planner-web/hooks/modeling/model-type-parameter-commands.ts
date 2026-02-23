@@ -16,7 +16,7 @@ export function useAddModelTypeParameter() {
   const queryClient = useQueryClient();
 
   const { mutateAsync: addModelTypeParameter, isPending } = useMutation({
-    mutationFn: (params: { modelId: ModelId; typeParameterId: TypeParameterId }) =>
+    mutationFn: (params: { modelId: ModelId }) =>
       modelingService.addModelTypeParameter({ type: ModelingCommandType.AddModelTypeParameter, ...params }),
     onSuccess: (model) => invalidateModel(queryClient, model.id, model.systemId),
   });
@@ -43,7 +43,10 @@ export function useRemoveAllModelTypeParameters() {
 
   const { mutateAsync: removeAllModelTypeParameters, isPending } = useMutation({
     mutationFn: (params: { modelId: ModelId }) =>
-      modelingService.removeAllModelTypeParameters({ type: ModelingCommandType.RemoveAllModelTypeParameters, ...params }),
+      modelingService.removeAllModelTypeParameters({
+        type: ModelingCommandType.RemoveAllModelTypeParameters,
+        ...params,
+      }),
     onSuccess: (model) => invalidateModel(queryClient, model.id, model.systemId),
   });
 
@@ -68,7 +71,11 @@ export function useEditModelTypeParameterConstraintType() {
   const queryClient = useQueryClient();
 
   const { mutateAsync: editModelTypeParameterConstraintType, isPending } = useMutation({
-    mutationFn: (params: { modelId: ModelId; typeParameterId: TypeParameterId; constraintType: TypeReference | null }) =>
+    mutationFn: (params: {
+      modelId: ModelId;
+      typeParameterId: TypeParameterId;
+      constraintType: TypeReference | null;
+    }) =>
       modelingService.editModelTypeParameterConstraintType({
         type: ModelingCommandType.EditModelTypeParameterConstraintType,
         ...params,
