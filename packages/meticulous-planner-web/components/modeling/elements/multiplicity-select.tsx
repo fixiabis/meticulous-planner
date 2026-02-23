@@ -20,8 +20,8 @@ export function MultiplicitySelect(props: MultiplicitySelectProps) {
 }
 
 const items = [
-  { value: Multiplicity.Single, label: '固定一個' },
-  { value: Multiplicity.Optional, label: '至多一個' },
+  { value: Multiplicity.Single, label: '固定一個的' },
+  { value: Multiplicity.Optional, label: '至多一個的' },
   { value: Multiplicity.Multiple, label: '不限數量的' },
-  { value: Multiplicity.AtLeastOne, label: '至少一個' },
+  { value: Multiplicity.AtLeastOne, label: '至少一個的' },
 ];

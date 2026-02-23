@@ -330,7 +330,7 @@ export function EditModelForm(props: EditModelFormProps) {
               value: false,
             },
             {
-              label: '能' + (model.stereotype === Stereotype.ExternalSystem ? '請' : '對') + '其以下操作：',
+              label: '能' + (model.stereotype === Stereotype.ExternalSystem ? '請' : '對') + '其進行以下操作：',
               value: true,
             },
           ]}
