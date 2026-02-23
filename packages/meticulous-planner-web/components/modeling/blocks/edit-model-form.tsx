@@ -171,7 +171,19 @@ export function EditModelForm(props: EditModelFormProps) {
           valueStringify={String}
         />
       </p>
-      {model.typeParameters.length > 0 && <p>由於用途廣泛，使用時需要以下模型資訊：</p>}
+      {model.typeParameters.length > 0 && (
+        <p className="group/type-parameters">
+          由於用途廣泛，使用時需要以下模型資訊：
+          <DropdownMenu
+            items={[{ label: '新增模型資訊', onSelect: () => addModelTypeParameter({ modelId: props.modelId }) }]}
+          >
+            <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/type-parameters:opacity-100">
+              {' '}
+              ...
+            </span>
+          </DropdownMenu>
+        </p>
+      )}
       {model.typeParameters.length > 0 && (
         <ul className="list-disc list-inside pl-6">
           {model.typeParameters.map((typeParameter) => (
@@ -238,7 +250,7 @@ export function EditModelForm(props: EditModelFormProps) {
           ))}
         </ul>
       )}
-      <p>
+      <p className="group/attributes">
         <Select
           value={model.attributes.length > 0}
           onChange={(hasAttribute) => {
@@ -254,11 +266,17 @@ export function EditModelForm(props: EditModelFormProps) {
           ]}
           valueStringify={String}
         />
+        <DropdownMenu items={[{ label: '新增資訊', onSelect: () => addModelAttribute({ modelId: props.modelId }) }]}>
+          <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/attributes:opacity-100">
+            {' '}
+            ...
+          </span>
+        </DropdownMenu>
       </p>
       {model.attributes.length > 0 && (
         <ul className="list-disc list-inside pl-6">
           {model.attributes.map((attribute) => (
-            <li key={attribute.id} className="relative group/type-parameter">
+            <li key={attribute.id} className="relative group/attribute">
               <ContentEditable
                 className={cn({ 'inline-block min-w-16': !attribute.descriptions[Language.Chinese]?.name })}
                 content={attribute.descriptions[Language.Chinese]?.name || ''}
@@ -314,7 +332,7 @@ export function EditModelForm(props: EditModelFormProps) {
           ))}
         </ul>
       )}
-      <p>
+      <p className="group/operations">
         <Select
           value={model.operations.length > 0}
           onChange={(hasOperation) => {
@@ -336,6 +354,12 @@ export function EditModelForm(props: EditModelFormProps) {
           ]}
           valueStringify={String}
         />
+        <DropdownMenu items={[{ label: '新增操作', onSelect: () => addModelOperation({ modelId: props.modelId }) }]}>
+          <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/operations:opacity-100">
+            {' '}
+            ...
+          </span>
+        </DropdownMenu>
       </p>
       {model.operations.length > 0 && (
         <ul className="list-disc list-inside pl-6">
@@ -451,14 +475,15 @@ export function EditModelForm(props: EditModelFormProps) {
                         }}
                       />
                       <DropdownMenu
+                        contentClassName="w-36"
                         items={[
                           {
-                            label: '新增資訊',
+                            label: '新增操作所需資訊',
                             onSelect: () =>
                               addModelOperationParameter({ modelId: props.modelId, operationId: operation.id }),
                           },
                           {
-                            label: '移除資訊',
+                            label: '移除操作所需資訊',
                             onSelect: () =>
                               removeModelOperationParameter({
                                 modelId: props.modelId,
@@ -482,7 +507,7 @@ export function EditModelForm(props: EditModelFormProps) {
         </ul>
       )}
       {model.stereotype === Stereotype.Enumeration && (
-        <p>
+        <p className="group/enumeration-items">
           <Select
             value={model.enumerationItems.length > 0}
             onChange={(hasEnumerationItem) => {
@@ -498,6 +523,14 @@ export function EditModelForm(props: EditModelFormProps) {
             ]}
             valueStringify={String}
           />
+          <DropdownMenu
+            items={[{ label: '新增種類', onSelect: () => addModelEnumerationItem({ modelId: props.modelId }) }]}
+          >
+            <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/enumeration-items:opacity-100">
+              {' '}
+              ...
+            </span>
+          </DropdownMenu>
         </p>
       )}
       {model.stereotype === Stereotype.Enumeration && model.enumerationItems.length > 0 && (
