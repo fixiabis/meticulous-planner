@@ -3,13 +3,7 @@ import { TypeReference } from '@/models/modeling/type-reference';
 import { Language, ModelId, TypeParameterId } from '@/models/modeling/values';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useModelingService } from './modeling-service';
-
-function invalidateModel(queryClient: ReturnType<typeof useQueryClient>, modelId: ModelId, systemId: string | null) {
-  queryClient.invalidateQueries({ queryKey: ['model', modelId] });
-  if (systemId) {
-    queryClient.invalidateQueries({ queryKey: ['models', `?systemId=${systemId}`] });
-  }
-}
+import { modelKey, systemModelsKey } from './queries';
 
 export function useAddModelTypeParameter() {
   const modelingService = useModelingService();
@@ -18,7 +12,10 @@ export function useAddModelTypeParameter() {
   const { mutateAsync: addModelTypeParameter, isPending } = useMutation({
     mutationFn: (params: { modelId: ModelId }) =>
       modelingService.addModelTypeParameter({ type: ModelingCommandType.AddModelTypeParameter, ...params }),
-    onSuccess: (model) => invalidateModel(queryClient, model.id, model.systemId),
+    onSuccess: (model) => {
+      queryClient.invalidateQueries({ queryKey: modelKey(model.id) });
+      queryClient.invalidateQueries({ queryKey: systemModelsKey(model.systemId) });
+    },
   });
 
   return { addModelTypeParameter, isPending };
@@ -31,7 +28,10 @@ export function useRemoveModelTypeParameter() {
   const { mutateAsync: removeModelTypeParameter, isPending } = useMutation({
     mutationFn: (params: { modelId: ModelId; typeParameterId: TypeParameterId }) =>
       modelingService.removeModelTypeParameter({ type: ModelingCommandType.RemoveModelTypeParameter, ...params }),
-    onSuccess: (model) => invalidateModel(queryClient, model.id, model.systemId),
+    onSuccess: (model) => {
+      queryClient.invalidateQueries({ queryKey: modelKey(model.id) });
+      queryClient.invalidateQueries({ queryKey: systemModelsKey(model.systemId) });
+    },
   });
 
   return { removeModelTypeParameter, isPending };
@@ -47,7 +47,10 @@ export function useRemoveAllModelTypeParameters() {
         type: ModelingCommandType.RemoveAllModelTypeParameters,
         ...params,
       }),
-    onSuccess: (model) => invalidateModel(queryClient, model.id, model.systemId),
+    onSuccess: (model) => {
+      queryClient.invalidateQueries({ queryKey: modelKey(model.id) });
+      queryClient.invalidateQueries({ queryKey: systemModelsKey(model.systemId) });
+    },
   });
 
   return { removeAllModelTypeParameters, isPending };
@@ -60,7 +63,10 @@ export function useRenameModelTypeParameter() {
   const { mutateAsync: renameModelTypeParameter, isPending } = useMutation({
     mutationFn: (params: { modelId: ModelId; typeParameterId: TypeParameterId; name: string; language: Language }) =>
       modelingService.renameModelTypeParameter({ type: ModelingCommandType.RenameModelTypeParameter, ...params }),
-    onSuccess: (model) => invalidateModel(queryClient, model.id, model.systemId),
+    onSuccess: (model) => {
+      queryClient.invalidateQueries({ queryKey: modelKey(model.id) });
+      queryClient.invalidateQueries({ queryKey: systemModelsKey(model.systemId) });
+    },
   });
 
   return { renameModelTypeParameter, isPending };
@@ -80,7 +86,10 @@ export function useEditModelTypeParameterConstraintType() {
         type: ModelingCommandType.EditModelTypeParameterConstraintType,
         ...params,
       }),
-    onSuccess: (model) => invalidateModel(queryClient, model.id, model.systemId),
+    onSuccess: (model) => {
+      queryClient.invalidateQueries({ queryKey: modelKey(model.id) });
+      queryClient.invalidateQueries({ queryKey: systemModelsKey(model.systemId) });
+    },
   });
 
   return { editModelTypeParameterConstraintType, isPending };

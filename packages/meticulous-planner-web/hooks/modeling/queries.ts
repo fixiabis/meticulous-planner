@@ -3,11 +3,21 @@ import { ModelId, SystemId } from '@/models/modeling/values';
 import { useQuery } from '@tanstack/react-query';
 import { useModelingService } from './modeling-service';
 
+export const modelKey = (modelId: ModelId | null) => ['models', modelId];
+
+export const systemModelsKey = (systemId: SystemId | null) => ['models', `?systemId=${systemId}`];
+
+export const systemServicesKey = (systemId: SystemId | null) => ['services', `?systemId=${systemId}`];
+
+export const systemsKey = () => ['systems'];
+
+export const systemKey = (systemId: SystemId | null) => ['systems', systemId];
+
 export function useModel(modelId: ModelId | null) {
   const modelingService = useModelingService();
 
   const { data: model, isLoading } = useQuery({
-    queryKey: ['model', modelId],
+    queryKey: modelKey(modelId),
     queryFn: () => modelId && modelingService.getModel({ type: ModelingQueryType.GetModel, modelId }),
     enabled: Boolean(modelId),
   });
@@ -19,7 +29,7 @@ export function useSystems() {
   const modelingService = useModelingService();
 
   const { data: systems, isLoading } = useQuery({
-    queryKey: ['systems'],
+    queryKey: systemsKey(),
     queryFn: () => modelingService.getSystems({ type: ModelingQueryType.GetSystems }),
   });
 
@@ -30,11 +40,9 @@ export function useSystemModels(systemId: SystemId | null) {
   const modelingService = useModelingService();
 
   const { data: models, isLoading } = useQuery({
-    queryKey: ['models', `?systemId=${systemId}`],
+    queryKey: systemModelsKey(systemId),
     queryFn: () =>
-      systemId
-        ? modelingService.getSystemModels({ type: ModelingQueryType.GetSystemModels, systemId: systemId })
-        : [],
+      systemId ? modelingService.getSystemModels({ type: ModelingQueryType.GetSystemModels, systemId: systemId }) : [],
     enabled: Boolean(systemId),
   });
 
@@ -45,7 +53,7 @@ export function useSystemServices(systemId: SystemId | null) {
   const modelingService = useModelingService();
 
   const { data: services, isLoading } = useQuery({
-    queryKey: ['services', `?systemId=${systemId}`],
+    queryKey: systemServicesKey(systemId),
     queryFn: () =>
       systemId
         ? modelingService.getSystemServices({ type: ModelingQueryType.GetSystemServices, systemId: systemId })
