@@ -1,3 +1,6 @@
+export type ProjectId = string & { readonly __brand: 'ProjectId' };
+export const ProjectId = (value: string) => value as ProjectId;
+
 export type SystemId = string & { readonly __brand: 'SystemId' };
 export const SystemId = (value: string) => value as SystemId;
 
@@ -55,4 +58,16 @@ export enum Language {
   Technical = 'technical',
   English = 'english',
   Chinese = 'chinese',
+}
+
+export enum SystemType {
+  Core = 'core',
+  Support = 'support',
+  Integration = 'integration',
+  Generic = 'generic',
+}
+
+export enum ServiceType {
+  Core = 'core',
+  Adapter = 'adapter',
 }

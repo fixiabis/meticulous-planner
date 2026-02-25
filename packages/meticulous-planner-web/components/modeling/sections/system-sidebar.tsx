@@ -3,13 +3,15 @@
 import { useRouter, usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { ChevronDown, ChevronRight, Plus } from 'lucide-react';
-import { useSystemServices, useSystemModels } from '@/hooks/modeling/queries';
+import { useSystem, useSystemServices, useSystemModels } from '@/hooks/modeling/queries';
 import { useAddService } from '@/hooks/modeling/service-commands';
+import { useEditSystemType } from '@/hooks/modeling/system-commands';
 import { useAddModel } from '@/hooks/modeling/model-commands';
+import { SystemTypeSelect } from '@/components/modeling/elements/system-type-select';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { Language, ServiceId, SystemId } from '@/models/modeling/values';
+import { Language, ServiceId, SystemId, SystemType } from '@/models/modeling/values';
 
 export type SystemSidebarProps = {
   systemId: SystemId;
@@ -18,9 +20,11 @@ export type SystemSidebarProps = {
 export function SystemSidebar({ systemId }: SystemSidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const { system } = useSystem(systemId);
   const { services } = useSystemServices(systemId);
   const { models } = useSystemModels(systemId);
   const { addService, isPending: isAddingService } = useAddService();
+  const { editSystemType } = useEditSystemType();
   const { addModel } = useAddModel();
   const [expandedServices, setExpandedServices] = useState<Set<string>>(new Set());
 
@@ -52,7 +56,7 @@ export function SystemSidebar({ systemId }: SystemSidebarProps) {
       name: '新模型',
       language: Language.Chinese,
     });
-    router.push(`/systems/${systemId}/services/${serviceId}/models/${model.id}`);
+    router.push(`/systems/${systemId}/models/${model.id}`);
   };
 
   const userServices = services.filter((s) => !s.isBase);
@@ -64,10 +68,20 @@ export function SystemSidebar({ systemId }: SystemSidebarProps) {
           variant="ghost"
           size="sm"
           className="w-full justify-start text-muted-foreground"
-          onClick={() => router.push('/')}
+          onClick={() => system?.projectId ? router.push(`/projects/${system.projectId}`) : router.push('/')}
         >
           ← 所有系統
         </Button>
+        {system && (
+          <p className="text-sm mt-2 px-1">
+            {system.descriptions[Language.Chinese]?.name || '未命名系統'} 是一個{' '}
+            <SystemTypeSelect
+              value={system.systemType}
+              onChange={(systemType) => editSystemType({ systemId, systemType })}
+            />{' '}
+            系統
+          </p>
+        )}
       </div>
       <ScrollArea className="flex-1">
         <div className="p-2">
@@ -110,7 +124,7 @@ export function SystemSidebar({ systemId }: SystemSidebarProps) {
                 {isExpanded && (
                   <div className="ml-6">
                     {serviceModels.map((model) => {
-                      const modelHref = `/systems/${systemId}/services/${service.id}/models/${model.id}`;
+                      const modelHref = `/systems/${systemId}/models/${model.id}`;
                       const isModelActive = pathname === modelHref;
                       return (
                         <button

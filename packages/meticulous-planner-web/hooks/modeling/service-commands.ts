@@ -1,5 +1,5 @@
 import { ModelingCommandType } from '@/models/modeling/messages/commands';
-import { Language, ServiceId, SystemId } from '@/models/modeling/values';
+import { Language, ServiceId, ServiceType, SystemId } from '@/models/modeling/values';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useModelingService } from './modeling-service';
 import { systemServicesKey } from './queries';
@@ -32,4 +32,19 @@ export function useRenameService() {
   });
 
   return { renameService, isPending };
+}
+
+export function useEditServiceType() {
+  const modelingService = useModelingService();
+  const queryClient = useQueryClient();
+
+  const { mutateAsync: editServiceType, isPending } = useMutation({
+    mutationFn: (params: { serviceId: ServiceId; serviceType: ServiceType }) =>
+      modelingService.editServiceType({ type: ModelingCommandType.EditServiceType, ...params }),
+    onSuccess: (service) => {
+      queryClient.invalidateQueries({ queryKey: systemServicesKey(service.systemId) });
+    },
+  });
+
+  return { editServiceType, isPending };
 }

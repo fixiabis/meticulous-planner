@@ -34,11 +34,7 @@ export const ContentEditable = forwardRef<HTMLDivElement, ContentEditableProps>(
 
   useEffect(() => {
     if (!editorRef.current) return;
-
-    if (props.content !== editingContent) {
-      setEditingContent(props.content);
-      editorRef.current.innerHTML = escapeHtml(props.content).replace(/\n/g, '<br>');
-    }
+    editorRef.current.innerHTML = escapeHtml(props.content).replace(/\n/g, '<br>');
   }, [props.content]);
 
   const handleClick = () => {
@@ -50,7 +46,7 @@ export const ContentEditable = forwardRef<HTMLDivElement, ContentEditableProps>(
     props.onEditStart?.();
   };
 
-  const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
+  const handleInput = (e: React.FormEvent<HTMLSpanElement>) => {
     const text = e.currentTarget.innerText ?? '';
 
     if (editingContent.trim() === '' || text.trim() === '') {
@@ -81,7 +77,7 @@ export const ContentEditable = forwardRef<HTMLDivElement, ContentEditableProps>(
   };
 
   return (
-    <div
+    <span
       ref={editorRef}
       tabIndex={0}
       contentEditable="plaintext-only"

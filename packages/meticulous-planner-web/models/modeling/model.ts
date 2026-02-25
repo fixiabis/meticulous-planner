@@ -9,6 +9,7 @@ import {
   EnumerationItemId,
   Language,
   ModelId,
+  ProjectId,
   ServiceId,
   Multiplicity,
   OperationId,
@@ -20,6 +21,7 @@ import {
 
 export type ModelProps = {
   readonly id: ModelId;
+  readonly projectId: ProjectId | null;
   readonly systemId: SystemId;
   readonly serviceId: ServiceId | null;
   readonly stereotype: Stereotype;
@@ -31,12 +33,13 @@ export type ModelProps = {
   readonly descriptions: Readonly<Partial<Record<Language, Description>>>;
 };
 
-export type WithModelProps = Partial<Omit<ModelProps, 'id' | 'systemId'>>;
+export type WithModelProps = Partial<Omit<ModelProps, 'id' | 'projectId' | 'systemId'>>;
 
 export type CreateModelProps = Partial<ModelProps> & Pick<ModelProps, 'id' | 'systemId'>;
 
 export class Model implements ModelProps {
   readonly id: ModelId;
+  readonly projectId: ProjectId | null;
   readonly systemId: SystemId;
   readonly serviceId: ServiceId | null;
   readonly stereotype: Stereotype;
@@ -49,6 +52,7 @@ export class Model implements ModelProps {
 
   constructor(props: ModelProps) {
     this.id = props.id;
+    this.projectId = props.projectId;
     this.systemId = props.systemId;
     this.serviceId = props.serviceId;
     this.stereotype = props.stereotype;
@@ -63,6 +67,7 @@ export class Model implements ModelProps {
   static create(props: CreateModelProps) {
     return new Model({
       id: props.id,
+      projectId: props.projectId ?? null,
       systemId: props.systemId ?? null,
       serviceId: props.serviceId ?? null,
       stereotype: props.stereotype ?? Stereotype.Entity,

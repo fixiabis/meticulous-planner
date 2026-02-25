@@ -4,22 +4,30 @@ import {
   EnumerationItemId,
   Language,
   ModelId,
+  ProjectId,
   ServiceId,
+  ServiceType,
   Multiplicity,
   OperationId,
   ParameterId,
   SystemId,
+  SystemType,
   Stereotype,
   TypeParameterId,
 } from '../values';
 
 export enum ModelingCommandType {
+  // Project
+  AddProject = 'add-project',
+  RenameProject = 'rename-project',
   // System
   AddSystem = 'add-system',
   RenameSystem = 'rename-system',
+  EditSystemType = 'edit-system-type',
   // Service
   AddService = 'add-service',
   RenameService = 'rename-service',
+  EditServiceType = 'edit-service-type',
   // Model
   AddModel = 'add-model',
   RenameModel = 'rename-model',
@@ -61,10 +69,27 @@ export enum ModelingCommandType {
   EditModelTypeParameterConstraintType = 'edit-model-type-parameter-constraint-type',
 }
 
+// Project
+
+export type AddProject = {
+  readonly type: ModelingCommandType.AddProject;
+  readonly projectId: ProjectId;
+  readonly name: string;
+  readonly language: Language;
+};
+
+export type RenameProject = {
+  readonly type: ModelingCommandType.RenameProject;
+  readonly projectId: ProjectId;
+  readonly name: string;
+  readonly language: Language;
+};
+
 // System
 
 export type AddSystem = {
   readonly type: ModelingCommandType.AddSystem;
+  readonly projectId: ProjectId | null;
   readonly name: string;
   readonly language: Language;
 };
@@ -74,6 +99,12 @@ export type RenameSystem = {
   readonly systemId: SystemId;
   readonly name: string;
   readonly language: Language;
+};
+
+export type EditSystemType = {
+  readonly type: ModelingCommandType.EditSystemType;
+  readonly systemId: SystemId;
+  readonly systemType: SystemType;
 };
 
 // Service
@@ -90,6 +121,12 @@ export type RenameService = {
   readonly serviceId: ServiceId;
   readonly name: string;
   readonly language: Language;
+};
+
+export type EditServiceType = {
+  readonly type: ModelingCommandType.EditServiceType;
+  readonly serviceId: ServiceId;
+  readonly serviceType: ServiceType;
 };
 
 // Model
@@ -320,8 +357,12 @@ export type EditModelEnumerationItemCode = {
 };
 
 export type ModelingCommand =
+  | AddProject
+  | RenameProject
+  | EditSystemType
   | AddService
   | RenameService
+  | EditServiceType
   | AddModel
   | RenameModel
   | EditModelStereotype

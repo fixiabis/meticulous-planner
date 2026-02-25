@@ -250,29 +250,31 @@ export function ModelEditor(props: ModelEditorProps) {
           ))}
         </ul>
       )}
-      <p className="group/attributes">
-        <Select
-          value={model.attributes.length > 0}
-          onChange={(hasAttribute) => {
-            if (hasAttribute) {
-              addModelAttribute({ modelId: props.modelId });
-            } else {
-              removeAllModelAttributes({ modelId: props.modelId });
-            }
-          }}
-          items={[
-            { label: '暫無任何資訊', value: false },
-            { label: '包含以下資訊：', value: true },
-          ]}
-          valueStringify={String}
-        />
-        <DropdownMenu items={[{ label: '新增資訊', onSelect: () => addModelAttribute({ modelId: props.modelId }) }]}>
-          <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/attributes:opacity-100">
-            {' '}
-            ...
-          </span>
-        </DropdownMenu>
-      </p>
+      {model.stereotype !== Stereotype.Enumeration && (
+        <p className="group/attributes">
+          <Select
+            value={model.attributes.length > 0}
+            onChange={(hasAttribute) => {
+              if (hasAttribute) {
+                addModelAttribute({ modelId: props.modelId });
+              } else {
+                removeAllModelAttributes({ modelId: props.modelId });
+              }
+            }}
+            items={[
+              { label: '暫無任何資訊', value: false },
+              { label: '包含以下資訊：', value: true },
+            ]}
+            valueStringify={String}
+          />
+          <DropdownMenu items={[{ label: '新增資訊', onSelect: () => addModelAttribute({ modelId: props.modelId }) }]}>
+            <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/attributes:opacity-100">
+              {' '}
+              ...
+            </span>
+          </DropdownMenu>
+        </p>
+      )}
       {model.attributes.length > 0 && (
         <ul className="list-disc list-outside pl-6">
           {model.attributes.map((attribute) => (
@@ -332,35 +334,37 @@ export function ModelEditor(props: ModelEditorProps) {
           ))}
         </ul>
       )}
-      <p className="group/operations">
-        <Select
-          value={model.operations.length > 0}
-          onChange={(hasOperation) => {
-            if (hasOperation) {
-              addModelOperation({ modelId: props.modelId });
-            } else {
-              removeAllModelOperations({ modelId: props.modelId });
-            }
-          }}
-          items={[
-            {
-              label: '暫無法' + (model.stereotype === Stereotype.ExternalSystem ? '請' : '對') + '其進行任何操作',
-              value: false,
-            },
-            {
-              label: '能' + (model.stereotype === Stereotype.ExternalSystem ? '請' : '對') + '其進行以下操作：',
-              value: true,
-            },
-          ]}
-          valueStringify={String}
-        />
-        <DropdownMenu items={[{ label: '新增操作', onSelect: () => addModelOperation({ modelId: props.modelId }) }]}>
-          <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/operations:opacity-100">
-            {' '}
-            ...
-          </span>
-        </DropdownMenu>
-      </p>
+      {model.stereotype !== Stereotype.Enumeration && (
+        <p className="group/operations">
+          <Select
+            value={model.operations.length > 0}
+            onChange={(hasOperation) => {
+              if (hasOperation) {
+                addModelOperation({ modelId: props.modelId });
+              } else {
+                removeAllModelOperations({ modelId: props.modelId });
+              }
+            }}
+            items={[
+              {
+                label: '暫無法' + (model.stereotype === Stereotype.ExternalSystem ? '請' : '對') + '其進行任何操作',
+                value: false,
+              },
+              {
+                label: '能' + (model.stereotype === Stereotype.ExternalSystem ? '請' : '對') + '其進行以下操作：',
+                value: true,
+              },
+            ]}
+            valueStringify={String}
+          />
+          <DropdownMenu items={[{ label: '新增操作', onSelect: () => addModelOperation({ modelId: props.modelId }) }]}>
+            <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/operations:opacity-100">
+              {' '}
+              ...
+            </span>
+          </DropdownMenu>
+        </p>
+      )}
       {model.operations.length > 0 && (
         <ul className="list-disc list-outside pl-6">
           {model.operations.map((operation) => (
