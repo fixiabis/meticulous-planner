@@ -1,51 +1,35 @@
 'use client';
 
-import { useState } from 'react';
-import { PanelLeft } from 'lucide-react';
-import { WorkspaceSidebar } from '@/components/workspace-sidebar';
-import { DocumentEditor } from '@/components/document-editor';
-import { DocumentSheet } from '@/components/document-sheet';
+import { use } from 'react';
+import { useRouter } from 'next/navigation';
+import { ModelEditor } from '@/components/modeling/blocks/model-editor';
+import { ModelId, ServiceId, SystemId } from '@/models/modeling/values';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 
-export default function Home() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+export default function ModelPage({
+  params,
+}: {
+  params: Promise<{ systemId: string; serviceId: string; modelId: string }>;
+}) {
+  const { systemId: systemIdStr, serviceId: serviceIdStr, modelId: modelIdStr } = use(params);
+  const systemId = SystemId(systemIdStr);
+  const serviceId = ServiceId(serviceIdStr);
+  const modelId = ModelId(modelIdStr);
+  const router = useRouter();
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
-      {/* Sidebar with slide animation */}
-      <div
-        className={cn(
-          'shrink-0 transition-[width,opacity] duration-300 ease-in-out overflow-hidden',
-          sidebarOpen ? 'w-64 opacity-100' : 'w-0 opacity-0',
-        )}
-      >
-        <WorkspaceSidebar onClose={() => setSidebarOpen(false)} />
-      </div>
-
-      {/* Main content area */}
-      <main className="relative flex-1 overflow-hidden">
-        {/* Floating toggle when sidebar is closed */}
-        <div
-          className={cn(
-            'absolute left-3 top-3 z-20 transition-opacity duration-200',
-            sidebarOpen ? 'pointer-events-none opacity-0' : 'opacity-100',
-          )}
+    <div className="max-w-3xl mx-auto py-8 px-4">
+      <div className="mb-4">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-muted-foreground"
+          onClick={() => router.push(`/systems/${systemId}/services/${serviceId}`)}
         >
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-muted-foreground hover:bg-secondary hover:text-foreground"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <PanelLeft className="h-4 w-4" />
-            <span className="sr-only">Open sidebar</span>
-          </Button>
-        </div>
-
-        <DocumentEditor />
-      </main>
-      <DocumentSheet />
+          ← 返回服務
+        </Button>
+      </div>
+      <ModelEditor modelId={modelId} />
     </div>
   );
 }

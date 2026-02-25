@@ -49,6 +49,12 @@ export function useSystemModels(systemId: SystemId | null) {
   return { models: models ?? [], isLoading };
 }
 
+export function useSystem(systemId: SystemId | null) {
+  const { systems, isLoading } = useSystems();
+  const system = systems.find((s) => s.id === systemId) ?? null;
+  return { system, isLoading };
+}
+
 export function useSystemServices(systemId: SystemId | null) {
   const modelingService = useModelingService();
 
