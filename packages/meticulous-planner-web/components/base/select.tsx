@@ -5,15 +5,17 @@ export type SelectProps<TItem> = {
   onChange: (value: TItem | null) => void;
   placeholder?: string;
   items: { label: string; value: TItem }[];
-  valueStringify: (value: TItem) => string;
+  valueStringify?: (value: TItem) => string;
 };
 
 export function Select<TItem>(props: SelectProps<TItem>) {
+  const valueStringify = props.valueStringify ?? String;
+
   return (
     <BaseSelect
-      value={props.value !== null ? props.valueStringify(props.value) : undefined}
+      value={props.value !== null ? valueStringify(props.value) : undefined}
       onValueChange={(valueString) =>
-        props.onChange?.(props.items.find((item) => props.valueStringify(item.value) === valueString)?.value ?? null)
+        props.onChange?.(props.items.find((item) => valueStringify(item.value) === valueString)?.value ?? null)
       }
     >
       <SelectTrigger className="inline-block shadow-none border-none p-1 py-0 -m-1 my-0 [&>.lucide-chevron-down]:hidden [font-size:inherit] cursor-pointer text-black! underline">
@@ -21,7 +23,7 @@ export function Select<TItem>(props: SelectProps<TItem>) {
       </SelectTrigger>
       <SelectContent>
         {props.items.map((item) => (
-          <SelectItem key={props.valueStringify(item.value)} value={props.valueStringify(item.value)}>
+          <SelectItem key={valueStringify(item.value)} value={valueStringify(item.value)}>
             {item.label}
           </SelectItem>
         ))}

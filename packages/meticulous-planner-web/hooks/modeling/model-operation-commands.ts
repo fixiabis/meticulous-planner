@@ -74,7 +74,7 @@ export function useEditModelOperationReturnType() {
   const queryClient = useQueryClient();
 
   const { mutateAsync: editModelOperationReturnType, isPending } = useMutation({
-    mutationFn: (params: { modelId: ModelId; operationId: OperationId; returnType: TypeReference }) =>
+    mutationFn: (params: { modelId: ModelId; operationId: OperationId; returnType: TypeReference | null }) =>
       modelingService.editModelOperationReturnType({
         type: ModelingCommandType.EditModelOperationReturnType,
         ...params,

@@ -139,7 +139,6 @@ export function ModelEditor(props: ModelEditorProps) {
             { label: '是基本概念', value: false },
             { label: '是一種' + (model.generalizationType ? '' : '...'), value: true },
           ]}
-          valueStringify={String}
         />
         {model.generalizationType && (
           <TypeReferenceInput
@@ -168,7 +167,6 @@ export function ModelEditor(props: ModelEditorProps) {
             { label: '用途明確', value: false },
             { label: '用途廣泛', value: true },
           ]}
-          valueStringify={String}
         />
       </p>
       {model.typeParameters.length > 0 && (
@@ -215,7 +213,6 @@ export function ModelEditor(props: ModelEditorProps) {
                   { label: '可以是任意模型', value: false },
                   { label: '只能是' + (typeParameter.constraintType ? '' : '...'), value: true },
                 ]}
-                valueStringify={String}
               />
               {typeParameter.constraintType !== null && (
                 <TypeReferenceInput
@@ -265,7 +262,6 @@ export function ModelEditor(props: ModelEditorProps) {
               { label: '暫無任何資訊', value: false },
               { label: '包含以下資訊：', value: true },
             ]}
-            valueStringify={String}
           />
           <DropdownMenu items={[{ label: '新增資訊', onSelect: () => addModelAttribute({ modelId: props.modelId }) }]}>
             <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/attributes:opacity-100">
@@ -355,7 +351,6 @@ export function ModelEditor(props: ModelEditorProps) {
                 value: true,
               },
             ]}
-            valueStringify={String}
           />
           <DropdownMenu items={[{ label: '新增操作', onSelect: () => addModelOperation({ modelId: props.modelId }) }]}>
             <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/operations:opacity-100">
@@ -383,7 +378,21 @@ export function ModelEditor(props: ModelEditorProps) {
                     })
                   }
                 />
-                ，會得到
+                ，操作後
+                <Select
+                  value={operation.returnType !== null}
+                  items={[
+                    { label: '不會得到任何資訊', value: false },
+                    { label: '會得到' + (operation.returnType ? '' : '...'), value: true },
+                  ]}
+                  onChange={(value) => {
+                    editModelOperationReturnType({
+                      modelId: props.modelId,
+                      operationId: operation.id,
+                      returnType: value === false ? null : TypeReference.createModel(null),
+                    });
+                  }}
+                ></Select>
                 <MultiplicitySelect
                   language={Language.Chinese}
                   value={operation.returnMultiplicity}
@@ -415,7 +424,6 @@ export function ModelEditor(props: ModelEditorProps) {
                     { label: '無需提供任何資訊', value: false },
                     { label: '需提供以下資訊：', value: true },
                   ]}
-                  valueStringify={String}
                 />
                 <DropdownMenu
                   items={[
@@ -519,7 +527,6 @@ export function ModelEditor(props: ModelEditorProps) {
                     { label: '操作時，暫無任何限制', value: false },
                     { label: '操作時，需要符合以下規則：', value: true },
                   ]}
-                  valueStringify={String}
                 />
               </p>
               <p>
@@ -535,7 +542,6 @@ export function ModelEditor(props: ModelEditorProps) {
                     { label: '操作後，暫不會使其造成任何改變', value: false },
                     { label: '操作後，會使其產生以下改變：', value: true },
                   ]}
-                  valueStringify={String}
                 />
               </p>
             </li>
@@ -557,7 +563,6 @@ export function ModelEditor(props: ModelEditorProps) {
               { label: '暫無任何種類', value: false },
               { label: '分為以下種類：', value: true },
             ]}
-            valueStringify={String}
           />
           <DropdownMenu
             items={[{ label: '新增種類', onSelect: () => addModelEnumerationItem({ modelId: props.modelId }) }]}

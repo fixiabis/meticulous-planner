@@ -13,7 +13,6 @@ export function SystemTypeSelect(props: SystemTypeSelectProps) {
       value={props.value}
       onChange={(value) => value && props.onChange?.(value)}
       items={items}
-      valueStringify={String}
     ></Select>
   );
 }

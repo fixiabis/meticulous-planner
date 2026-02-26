@@ -148,7 +148,7 @@ export class Model implements ModelProps {
     return this.withOperation(operationId, (op) => op.rename(name, language));
   }
 
-  editOperationReturnType(operationId: OperationId, type: TypeReference) {
+  editOperationReturnType(operationId: OperationId, type: TypeReference | null) {
     return this.withOperation(operationId, (op) => op.editReturnType(type));
   }
 

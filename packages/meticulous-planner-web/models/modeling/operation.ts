@@ -50,7 +50,7 @@ export class Operation implements OperationProps {
     });
   }
 
-  editReturnType(returnType: TypeReference) {
+  editReturnType(returnType: TypeReference | null) {
     return this.withProps({ returnType });
   }
 

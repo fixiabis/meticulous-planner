@@ -234,7 +234,7 @@ export type EditModelOperationReturnType = {
   readonly type: ModelingCommandType.EditModelOperationReturnType;
   readonly modelId: ModelId;
   readonly operationId: OperationId;
-  readonly returnType: TypeReference;
+  readonly returnType: TypeReference | null;
 };
 
 export type EditModelOperationMultiplicity = {

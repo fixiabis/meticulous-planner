@@ -14,7 +14,6 @@ export function StereotypeSelect(props: StereotypeSelectProps) {
       value={props.value}
       onChange={(value) => value && props.onChange?.(value)}
       items={items}
-      valueStringify={String}
     ></Select>
   );
 }
@@ -37,5 +36,5 @@ const items = [
   { value: Stereotype.Entity, label: '記錄項目' },
   { value: Stereotype.ValueObject, label: '格式' },
 
-  { value: Stereotype.Enumeration, label: '分類' },
+  { value: Stereotype.Enumeration, label: '種類' },
 ];
