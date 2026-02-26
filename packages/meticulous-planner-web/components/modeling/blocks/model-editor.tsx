@@ -514,36 +514,6 @@ export function ModelEditor(props: ModelEditorProps) {
                   ))}
                 </ul>
               )}
-              <p>
-                <Select
-                  value={true}
-                  onChange={(hasRule) => {
-                    if (hasRule) {
-                      console.log('TODO: show operation rule editor');
-                    } else {
-                    }
-                  }}
-                  items={[
-                    { label: '操作時，暫無任何限制', value: false },
-                    { label: '操作時，需要符合以下規則：', value: true },
-                  ]}
-                />
-              </p>
-              <p>
-                <Select
-                  value={true}
-                  onChange={(hasEffect) => {
-                    if (hasEffect) {
-                      console.log('TODO: show operation effect editor');
-                    } else {
-                    }
-                  }}
-                  items={[
-                    { label: '操作後，暫不會使其造成任何改變', value: false },
-                    { label: '操作後，會使其產生以下改變：', value: true },
-                  ]}
-                />
-              </p>
             </li>
           ))}
         </ul>
