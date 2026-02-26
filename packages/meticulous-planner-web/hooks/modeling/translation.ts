@@ -18,6 +18,7 @@ import {
   ParameterId,
   TypeParameterId,
 } from '@/models/modeling/values';
+import { toTechnicalName } from '@/lib/naming';
 import { useModelingService } from './modeling-service';
 import { modelKey, systemModelsKey, useModel } from './queries';
 
@@ -54,7 +55,37 @@ async function callGemini(prompt: string, apiKey: string): Promise<string> {
   return data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
 }
 
-export function useTranslateModelToTechnical(modelId: ModelId | null) {
+async function dispatchRename(
+  modelingService: ReturnType<typeof useModelingService>,
+  cmd: RenameModel | RenameModelAttribute | RenameModelEnumerationItem | RenameModelOperation | RenameModelOperationParameter | RenameModelTypeParameter,
+) {
+  switch (cmd.type) {
+    case ModelingCommandType.RenameModel:
+      return modelingService.renameModel(cmd);
+    case ModelingCommandType.RenameModelAttribute:
+      return modelingService.renameModelAttribute(cmd);
+    case ModelingCommandType.RenameModelEnumerationItem:
+      return modelingService.renameModelEnumerationItem(cmd);
+    case ModelingCommandType.RenameModelOperation:
+      return modelingService.renameModelOperation(cmd);
+    case ModelingCommandType.RenameModelOperationParameter:
+      return modelingService.renameModelOperationParameter(cmd);
+    case ModelingCommandType.RenameModelTypeParameter:
+      return modelingService.renameModelTypeParameter(cmd);
+  }
+}
+
+/** Renames a model element in both Language.English and Language.Technical (auto-derived). */
+async function renameWithTechnical(
+  modelingService: ReturnType<typeof useModelingService>,
+  englishCmd: RenameModel | RenameModelAttribute | RenameModelEnumerationItem | RenameModelOperation | RenameModelOperationParameter | RenameModelTypeParameter,
+) {
+  await dispatchRename(modelingService, englishCmd);
+  const technicalCmd = { ...englishCmd, name: toTechnicalName(englishCmd.name), language: Language.Technical };
+  await dispatchRename(modelingService, technicalCmd);
+}
+
+export function useTranslateModelToEnglish(modelId: ModelId | null) {
   const { model } = useModel(modelId);
   const modelingService = useModelingService();
   const queryClient = useQueryClient();
@@ -93,87 +124,78 @@ export function useTranslateModelToTechnical(modelId: ModelId | null) {
         })),
       };
 
-      const prompt = `You are a software engineer translating Chinese domain model names into TypeScript-friendly technical identifiers.
+      const prompt = `You are a domain-driven design expert. Translate the following Chinese domain model element names into fluent, natural English.
 
-Given the following domain model in Chinese, translate all names to English technical identifiers:
-- modelName → PascalCase (e.g., "訂單" → "Order", "訂單聚合根" → "OrderAggregate")
-- typeParameter names → PascalCase (e.g., "項目" → "Item")
-- attribute names → camelCase (e.g., "顧客編號" → "customerId", "總金額" → "totalAmount")
-- operation names → camelCase (e.g., "下訂單" → "placeOrder", "計算總金額" → "calculateTotal")
-- parameter names → camelCase
-- enumerationItem names → PascalCase (e.g., "待處理" → "Pending", "已確認" → "Confirmed")
-- enumerationItem codes → keep existing code if non-empty, otherwise generate snake_case (e.g., "pending", "confirmed")
+Rules:
+- Translate to natural English words/phrases (NOT camelCase, NOT PascalCase, NOT snake_case)
+- Use spaces between words, e.g. "order number", "place order", "customer id"
+- Keep names concise and semantically accurate
+- enumerationItem codes: keep existing code if non-empty, otherwise generate a short lowercase English word
 
 Input:
 ${JSON.stringify(inputData, null, 2)}
 
-Return ONLY a valid JSON object with the exact same structure, with all names translated to English technical identifiers. Preserve the id fields exactly as provided. Do not include any explanation or markdown.`;
+Return ONLY a valid JSON object with the exact same structure, with all names translated to natural English. Preserve the id fields exactly as provided. Do not include any explanation or markdown.`;
 
       const resultText = await callGemini(prompt, apiKey);
       const result: TranslationResult = JSON.parse(resultText);
 
-      const renameModelCmd: RenameModel = {
+      await renameWithTechnical(modelingService, {
         type: ModelingCommandType.RenameModel,
         modelId: model.id,
         name: result.modelName,
-        language: Language.Technical,
-      };
-      await modelingService.renameModel(renameModelCmd);
+        language: Language.English,
+      });
 
       for (const tp of result.typeParameters) {
-        const cmd: RenameModelTypeParameter = {
+        await renameWithTechnical(modelingService, {
           type: ModelingCommandType.RenameModelTypeParameter,
           modelId: model.id,
           typeParameterId: TypeParameterId(tp.id),
           name: tp.name,
-          language: Language.Technical,
-        };
-        await modelingService.renameModelTypeParameter(cmd);
+          language: Language.English,
+        });
       }
 
       for (const attr of result.attributes) {
-        const cmd: RenameModelAttribute = {
+        await renameWithTechnical(modelingService, {
           type: ModelingCommandType.RenameModelAttribute,
           modelId: model.id,
           attributeId: AttributeId(attr.id),
           name: attr.name,
-          language: Language.Technical,
-        };
-        await modelingService.renameModelAttribute(cmd);
+          language: Language.English,
+        });
       }
 
       for (const op of result.operations) {
-        const opCmd: RenameModelOperation = {
+        await renameWithTechnical(modelingService, {
           type: ModelingCommandType.RenameModelOperation,
           modelId: model.id,
           operationId: OperationId(op.id),
           name: op.name,
-          language: Language.Technical,
-        };
-        await modelingService.renameModelOperation(opCmd);
+          language: Language.English,
+        });
 
         for (const param of op.parameters) {
-          const paramCmd: RenameModelOperationParameter = {
+          await renameWithTechnical(modelingService, {
             type: ModelingCommandType.RenameModelOperationParameter,
             modelId: model.id,
             operationId: OperationId(op.id),
             parameterId: ParameterId(param.id),
             name: param.name,
-            language: Language.Technical,
-          };
-          await modelingService.renameModelOperationParameter(paramCmd);
+            language: Language.English,
+          });
         }
       }
 
       for (const item of result.enumerationItems) {
-        const itemCmd: RenameModelEnumerationItem = {
+        await renameWithTechnical(modelingService, {
           type: ModelingCommandType.RenameModelEnumerationItem,
           modelId: model.id,
           enumerationItemId: EnumerationItemId(item.id),
           name: item.name,
-          language: Language.Technical,
-        };
-        await modelingService.renameModelEnumerationItem(itemCmd);
+          language: Language.English,
+        });
 
         if (item.code) {
           await modelingService.editModelEnumerationItemCode({
@@ -194,3 +216,6 @@ Return ONLY a valid JSON object with the exact same structure, with all names tr
 
   return { translate, isPending };
 }
+
+// Backward-compat alias
+export { useTranslateModelToEnglish as useTranslateModelToTechnical };

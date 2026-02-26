@@ -4,6 +4,7 @@ import { Operation } from '../operation';
 import { Parameter } from '../parameter';
 import { TypeReference } from '../type-reference';
 import { Language, Multiplicity, Stereotype, TypeReferenceType } from '../values';
+import { kebabToCamelCase, kebabToPascalCase, toTechnicalName } from '@/lib/naming';
 
 const BASE_TYPE_MAP: Record<string, string> = {
   'base-string': 'string',
@@ -16,11 +17,39 @@ const BASE_TYPE_MAP: Record<string, string> = {
   'base-awaitable': 'Promise',
 };
 
-function getDescName(
+function getRawTechnicalName(
   descriptions: Readonly<Partial<Record<Language, { name: string }>>>,
   fallback: string,
 ): string {
-  return descriptions[Language.Technical]?.name || descriptions[Language.Chinese]?.name || fallback;
+  return (
+    descriptions[Language.Technical]?.name ||
+    toTechnicalName(descriptions[Language.English]?.name || '') ||
+    fallback
+  );
+}
+
+/** Returns a PascalCase TypeScript type name (for classes, interfaces, types, enums). */
+function getTypeName(
+  descriptions: Readonly<Partial<Record<Language, { name: string }>>>,
+  fallback: string,
+): string {
+  const technical =
+    descriptions[Language.Technical]?.name ||
+    toTechnicalName(descriptions[Language.English]?.name || '');
+  if (technical) return kebabToPascalCase(technical) || technical;
+  return fallback;
+}
+
+/** Returns a camelCase TypeScript member name (for attributes, operations, parameters). */
+function getMemberName(
+  descriptions: Readonly<Partial<Record<Language, { name: string }>>>,
+  fallback: string,
+): string {
+  const technical =
+    descriptions[Language.Technical]?.name ||
+    toTechnicalName(descriptions[Language.English]?.name || '');
+  if (technical) return kebabToCamelCase(technical) || technical;
+  return fallback;
 }
 
 function resolveTypeRef(typeRef: TypeReference, allModels: Model[]): string {
@@ -29,7 +58,7 @@ function resolveTypeRef(typeRef: TypeReference, allModels: Model[]): string {
     const ownerModel = allModels.find((m) => m.id === typeRef.modelId);
     if (!ownerModel) return 'T';
     const tp = ownerModel.typeParameters.find((tp) => tp.id === typeRef.typeParameterId);
-    return tp ? getDescName(tp.descriptions, 'T') : 'T';
+    return tp ? getTypeName(tp.descriptions, 'T') : 'T';
   }
 
   if (!typeRef.modelId) return 'unknown';
@@ -46,7 +75,7 @@ function resolveTypeRef(typeRef: TypeReference, allModels: Model[]): string {
       : [];
 
   const baseName =
-    baseTypeName ?? (targetModel ? getDescName(targetModel.descriptions, 'unknown') : 'unknown');
+    baseTypeName ?? (targetModel ? getTypeName(targetModel.descriptions, 'unknown') : 'unknown');
   return typeArgStrs.length > 0 ? `${baseName}<${typeArgStrs.join(', ')}>` : baseName;
 }
 
@@ -80,7 +109,7 @@ function opReturnTypeStr(op: Operation, allModels: Model[]): string {
 
 function buildTypeParamStr(model: Model): string {
   if (model.typeParameters.length === 0) return '';
-  const names = model.typeParameters.map((tp) => getDescName(tp.descriptions, tp.id));
+  const names = model.typeParameters.map((tp) => getTypeName(tp.descriptions, tp.id));
   return `<${names.join(', ')}>`;
 }
 
@@ -92,7 +121,7 @@ function formatCtorParams(pairs: Array<[string, string]>): string {
 function formatOpParams(op: Operation, allModels: Model[]): string {
   if (op.parameters.length === 0) return '';
   const lines = op.parameters.map((p) => {
-    const n = getDescName(p.descriptions, '_param');
+    const n = getMemberName(p.descriptions, '_param');
     const t = paramTypeStr(p, allModels);
     return `    ${n}: ${t},`;
   });
@@ -102,7 +131,7 @@ function formatOpParams(op: Operation, allModels: Model[]): string {
 function classOperations(model: Model, allModels: Model[]): string {
   return model.operations
     .map((op) => {
-      const name = getDescName(op.descriptions, '_operation');
+      const name = getMemberName(op.descriptions, '_operation');
       const params = formatOpParams(op, allModels);
       const retType = opReturnTypeStr(op, allModels);
       return `\n  ${name}(${params}): ${retType} {\n    // ...\n  }`;
@@ -113,7 +142,7 @@ function classOperations(model: Model, allModels: Model[]): string {
 function interfaceOperations(model: Model, allModels: Model[]): string {
   return model.operations
     .map((op) => {
-      const name = getDescName(op.descriptions, '_operation');
+      const name = getMemberName(op.descriptions, '_operation');
       const params = formatOpParams(op, allModels);
       const retType = opReturnTypeStr(op, allModels);
       return `  ${name}(${params}): ${retType};`;
@@ -122,18 +151,18 @@ function interfaceOperations(model: Model, allModels: Model[]): string {
 }
 
 function generateAggregateRoot(model: Model, allModels: Model[]): string {
-  const name = getDescName(model.descriptions, model.id);
+  const name = getTypeName(model.descriptions, model.id);
   const tpStr = buildTypeParamStr(model);
   const extendsStr = model.generalizationType
     ? ` extends ${resolveTypeRef(model.generalizationType, allModels)}`
     : '';
 
   const ctorPairs: Array<[string, string]> = model.attributes.map((a) => [
-    `readonly ${getDescName(a.descriptions, '_field')}`,
+    `readonly ${getMemberName(a.descriptions, '_field')}`,
     attrTypeStr(a, allModels),
   ]);
   const createPairs: Array<[string, string]> = model.attributes.map((a) => [
-    getDescName(a.descriptions, '_field'),
+    getMemberName(a.descriptions, '_field'),
     attrTypeStr(a, allModels),
   ]);
 
@@ -151,14 +180,14 @@ function generateAggregateRoot(model: Model, allModels: Model[]): string {
 }
 
 function generateEntity(model: Model, allModels: Model[]): string {
-  const name = getDescName(model.descriptions, model.id);
+  const name = getTypeName(model.descriptions, model.id);
   const tpStr = buildTypeParamStr(model);
   const extendsStr = model.generalizationType
     ? ` extends ${resolveTypeRef(model.generalizationType, allModels)}`
     : '';
 
   const ctorPairs: Array<[string, string]> = model.attributes.map((a) => [
-    `readonly ${getDescName(a.descriptions, '_field')}`,
+    `readonly ${getMemberName(a.descriptions, '_field')}`,
     attrTypeStr(a, allModels),
   ]);
   const ctorParams = formatCtorParams(ctorPairs);
@@ -170,14 +199,14 @@ function generateEntity(model: Model, allModels: Model[]): string {
 }
 
 function generateValueObject(model: Model, allModels: Model[]): string {
-  const name = getDescName(model.descriptions, model.id);
+  const name = getTypeName(model.descriptions, model.id);
   const tpStr = buildTypeParamStr(model);
   const extendsStr = model.generalizationType
     ? ` extends ${resolveTypeRef(model.generalizationType, allModels)}`
     : '';
 
   const ctorPairs: Array<[string, string]> = model.attributes.map((a) => [
-    `readonly ${getDescName(a.descriptions, '_field')}`,
+    `readonly ${getMemberName(a.descriptions, '_field')}`,
     attrTypeStr(a, allModels),
   ]);
   const ctorParams = formatCtorParams(ctorPairs);
@@ -188,11 +217,11 @@ function generateValueObject(model: Model, allModels: Model[]): string {
 }
 
 function generateTypeAlias(model: Model, allModels: Model[]): string {
-  const name = getDescName(model.descriptions, model.id);
+  const name = getTypeName(model.descriptions, model.id);
   const tpStr = buildTypeParamStr(model);
 
   const fields = model.attributes
-    .map((a) => `  readonly ${getDescName(a.descriptions, '_field')}: ${attrTypeStr(a, allModels)};`)
+    .map((a) => `  readonly ${getMemberName(a.descriptions, '_field')}: ${attrTypeStr(a, allModels)};`)
     .join('\n');
 
   if (model.generalizationType) {
@@ -208,14 +237,14 @@ function generateTypeAlias(model: Model, allModels: Model[]): string {
 }
 
 function generateErrorClass(model: Model, allModels: Model[]): string {
-  const baseName = getDescName(model.descriptions, model.id);
+  const baseName = getTypeName(model.descriptions, model.id);
   const name = baseName.endsWith('Error') ? baseName : `${baseName}Error`;
   const extendsStr = model.generalizationType
     ? ` extends ${resolveTypeRef(model.generalizationType, allModels)}`
     : ' extends Error';
 
   const ctorPairs: Array<[string, string]> = model.attributes.map((a) => [
-    `readonly ${getDescName(a.descriptions, '_field')}`,
+    `readonly ${getMemberName(a.descriptions, '_field')}`,
     attrTypeStr(a, allModels),
   ]);
   const ctorParams = formatCtorParams(ctorPairs);
@@ -228,7 +257,7 @@ function generateErrorClass(model: Model, allModels: Model[]): string {
 }
 
 function generateInterface(model: Model, allModels: Model[], nameSuffix: string = ''): string {
-  const baseName = getDescName(model.descriptions, model.id);
+  const baseName = getTypeName(model.descriptions, model.id);
   const name = `${baseName}${nameSuffix}`;
   const tpStr = buildTypeParamStr(model);
   const extendsStr = model.generalizationType
@@ -236,7 +265,7 @@ function generateInterface(model: Model, allModels: Model[], nameSuffix: string 
     : '';
 
   const attrFields = model.attributes
-    .map((a) => `  readonly ${getDescName(a.descriptions, '_field')}: ${attrTypeStr(a, allModels)};`)
+    .map((a) => `  readonly ${getMemberName(a.descriptions, '_field')}: ${attrTypeStr(a, allModels)};`)
     .join('\n');
 
   const opMethods = interfaceOperations(model, allModels);
@@ -248,7 +277,7 @@ function generateInterface(model: Model, allModels: Model[], nameSuffix: string 
 }
 
 function generateEnum(model: Model): string {
-  const name = getDescName(model.descriptions, model.id);
+  const name = getTypeName(model.descriptions, model.id);
 
   if (model.enumerationItems.length === 0) {
     return `export enum ${name} {}`;
@@ -256,7 +285,7 @@ function generateEnum(model: Model): string {
 
   const items = model.enumerationItems
     .map((item) => {
-      const itemName = getDescName(item.descriptions, item.id);
+      const itemName = getTypeName(item.descriptions, item.id);
       const code = item.code || item.id;
       return `  ${itemName} = '${code}',`;
     })
@@ -288,15 +317,14 @@ export function generateTypeScriptCode(model: Model, allModels: Model[]): string
     case Stereotype.Enumeration:
       return generateEnum(model);
     default:
-      return `// ${getDescName(model.descriptions, model.id)}: unsupported stereotype`;
+      return `// ${getRawTechnicalName(model.descriptions, model.id)}: unsupported stereotype`;
   }
 }
 
 export function getModelFilePath(model: Model): string {
-  const name = getDescName(model.descriptions, model.id);
-  const kebab = name
-    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
-    .replace(/\s+/g, '-')
-    .toLowerCase();
+  const technical = model.descriptions[Language.Technical]?.name;
+  if (technical) return `${technical}.ts`;
+  const name = model.descriptions[Language.Chinese]?.name || model.id;
+  const kebab = name.replace(/\s+/g, '-').toLowerCase();
   return `${kebab}.ts`;
 }
