@@ -2,11 +2,19 @@
 
 ## 維護說明
 
-**每完成一個有意義的改動後，必須主動更新本檔案（CLAUDE.md）**，將以下內容補充進對應段落：
-- 新增的 enum / type / class 及其語意
-- 新增的 UI 文字規則（labels、actionWord、placeholder 等）
-- 修改的架構決策或設計原則
-- 重要的 backward compat / fallback 規則
+**每完成一個有意義的改動後，必須依序執行：**
+
+1. 更新本檔案（CLAUDE.md），將以下內容補充進對應段落：
+   - 新增的 enum / type / class 及其語意
+   - 新增的 UI 文字規則（labels、actionWord、placeholder 等）
+   - 修改的架構決策或設計原則
+   - 重要的 backward compat / fallback 規則
+
+2. 執行 git commit，將所有改動（含 CLAUDE.md）一次提交：
+   ```bash
+   git add -p   # 或指定檔案
+   git commit -m "meaningful commit message"
+   ```
 
 ---
 
