@@ -17,7 +17,7 @@ export function ModelingSection(props: ModelingSectionProps) {
         </ResizablePanel>
         <ResizableHandle />
         <ResizablePanel defaultSize={0}>
-          <CodeViewer />
+          <CodeViewer modelId={ModelId("sample")} />
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>

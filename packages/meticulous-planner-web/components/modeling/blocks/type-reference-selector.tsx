@@ -20,6 +20,7 @@ export function TypeReferenceSelector(props: TypeReferenceSelectorProps) {
   const { services } = useSystemServices(model?.systemId ?? null);
   const { models } = useSystemModels(model?.systemId ?? null);
   const modelsOfServices = Map.groupBy(models, (model) => model.serviceId);
+  const labels = LABELS[props.language];
 
   const label =
     props.value?.type === TypeReferenceType.Model
@@ -40,15 +41,15 @@ export function TypeReferenceSelector(props: TypeReferenceSelectorProps) {
       }}
     >
       <PopoverTrigger>
-        <span className={cn('cursor-pointer underline', { 'opacity-50': !label })}>{label || '某模型'}</span>
+        <span className={cn('cursor-pointer underline', { 'opacity-50': !label })}>{label || labels.placeholder}</span>
       </PopoverTrigger>
       <PopoverContent className="p-0 w-72">
         <Command className="space-y-2">
-          <CommandInput placeholder="搜尋" className="h-9" onValueChange={setSearchText} value={searchText} />
+          <CommandInput placeholder={labels.searchPlaceholder} className="h-9" onValueChange={setSearchText} value={searchText} />
           <CommandList>
             <CommandEmpty>
               <div className="p-2">
-                <p className="text-xs text-muted-foreground text-center">沒有找到結果</p>
+                <p className="text-xs text-muted-foreground text-center">{labels.noResults}</p>
               </div>
             </CommandEmpty>
             {model && model.typeParameters.length > 0 && (
@@ -110,3 +111,27 @@ export function TypeReferenceSelector(props: TypeReferenceSelectorProps) {
     </Popover>
   );
 }
+
+type Labels = {
+  placeholder: string;
+  searchPlaceholder: string;
+  noResults: string;
+};
+
+const LABELS: Record<Language, Labels> = {
+  [Language.Chinese]: {
+    placeholder: '某模型',
+    searchPlaceholder: '搜尋',
+    noResults: '沒有找到結果',
+  },
+  [Language.English]: {
+    placeholder: 'a model',
+    searchPlaceholder: 'Search',
+    noResults: 'No results',
+  },
+  [Language.Technical]: {
+    placeholder: '[model]',
+    searchPlaceholder: 'search',
+    noResults: 'no-results',
+  },
+};

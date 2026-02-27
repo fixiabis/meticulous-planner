@@ -36,7 +36,11 @@ function useEnglishRename(commands: ModelCommands) {
   }
   function renameParameter(params: Omit<Parameters<ModelCommands['renameModelOperationParameter']>[0], 'language'>) {
     commands.renameModelOperationParameter({ ...params, language: Language.English });
-    commands.renameModelOperationParameter({ ...params, name: toTechnicalName(params.name), language: Language.Technical });
+    commands.renameModelOperationParameter({
+      ...params,
+      name: toTechnicalName(params.name),
+      language: Language.Technical,
+    });
   }
   function renameTypeParameter(params: Omit<Parameters<ModelCommands['renameModelTypeParameter']>[0], 'language'>) {
     commands.renameModelTypeParameter({ ...params, language: Language.English });
@@ -44,7 +48,11 @@ function useEnglishRename(commands: ModelCommands) {
   }
   function renameEnumerationItem(params: Omit<Parameters<ModelCommands['renameModelEnumerationItem']>[0], 'language'>) {
     commands.renameModelEnumerationItem({ ...params, language: Language.English });
-    commands.renameModelEnumerationItem({ ...params, name: toTechnicalName(params.name), language: Language.Technical });
+    commands.renameModelEnumerationItem({
+      ...params,
+      name: toTechnicalName(params.name),
+      language: Language.Technical,
+    });
   }
   return { renameModel, renameAttribute, renameOperation, renameParameter, renameTypeParameter, renameEnumerationItem };
 }
@@ -71,20 +79,19 @@ export function ModelEnglishView({ modelId, model, commands }: ModelEnglishViewP
         />
       </h1>
       <p>
-        is a{' '}
+        Is a{' '}
         <StereotypeSelect
           language={lang}
           value={model.stereotype}
           onChange={(stereotype) => commands.editModelStereotype({ modelId, stereotype })}
-        />{' '}
-        in{' '}
+        />{' in '}
         <ServiceSelector
           systemId={model.systemId}
           language={lang}
           value={model.serviceId}
           onChange={(serviceId) => commands.moveModelToService({ modelId, serviceId })}
         />
-        ,{' '}
+        {', '}
         <Select
           value={model.generalizationType !== null}
           onChange={(hasGeneralization) => {
@@ -111,7 +118,7 @@ export function ModelEnglishView({ modelId, model, commands }: ModelEnglishViewP
             />
           </>
         )}
-        ,{' '}
+        {', '}
         <Select
           value={model.typeParameters.length > 0}
           onChange={(hasTypeParameter) => {
@@ -177,7 +184,11 @@ export function ModelEnglishView({ modelId, model, commands }: ModelEnglishViewP
                     typeParameterModelId={model.id}
                     language={lang}
                     onChange={(constraintType) =>
-                      commands.editModelTypeParameterConstraintType({ modelId, typeParameterId: typeParameter.id, constraintType })
+                      commands.editModelTypeParameterConstraintType({
+                        modelId,
+                        typeParameterId: typeParameter.id,
+                        constraintType,
+                      })
                     }
                   />
                 </>
@@ -185,7 +196,10 @@ export function ModelEnglishView({ modelId, model, commands }: ModelEnglishViewP
               <DropdownMenu
                 items={[
                   { label: 'Add type input', onSelect: () => commands.addModelTypeParameter({ modelId }) },
-                  { label: 'Remove type input', onSelect: () => commands.removeModelTypeParameter({ modelId, typeParameterId: typeParameter.id }) },
+                  {
+                    label: 'Remove type input',
+                    onSelect: () => commands.removeModelTypeParameter({ modelId, typeParameterId: typeParameter.id }),
+                  },
                 ]}
               >
                 <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/type-parameter:opacity-100">
@@ -230,26 +244,31 @@ export function ModelEnglishView({ modelId, model, commands }: ModelEnglishViewP
                 className={cn({ 'inline-block min-w-16': !attribute.descriptions[lang]?.name })}
                 content={getName(attribute.descriptions)}
                 placeholder="Field name"
-                onContentChange={(name) =>
-                  rename.renameAttribute({ modelId, attributeId: attribute.id, name })
-                }
+                onContentChange={(name) => rename.renameAttribute({ modelId, attributeId: attribute.id, name })}
               />
               {': '}
               <MultiplicitySelect
                 language={lang}
                 value={attribute.multiplicity}
-                onChange={(multiplicity) => commands.editModelAttributeMultiplicity({ modelId, attributeId: attribute.id, multiplicity })}
-              />
+                onChange={(multiplicity) =>
+                  commands.editModelAttributeMultiplicity({ modelId, attributeId: attribute.id, multiplicity })
+                }
+              />{' '}
               <TypeReferenceInput
                 value={attribute.type}
                 typeParameterModelId={model.id}
                 language={lang}
-                onChange={(type) => commands.editModelAttributeType({ modelId, attributeId: attribute.id, attributeType: type })}
+                onChange={(type) =>
+                  commands.editModelAttributeType({ modelId, attributeId: attribute.id, attributeType: type })
+                }
               />
               <DropdownMenu
                 items={[
                   { label: 'Add field', onSelect: () => commands.addModelAttribute({ modelId }) },
-                  { label: 'Remove field', onSelect: () => commands.removeModelAttribute({ modelId, attributeId: attribute.id }) },
+                  {
+                    label: 'Remove field',
+                    onSelect: () => commands.removeModelAttribute({ modelId, attributeId: attribute.id }),
+                  },
                 ]}
               >
                 <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/attribute:opacity-100">
@@ -275,15 +294,14 @@ export function ModelEnglishView({ modelId, model, commands }: ModelEnglishViewP
             }}
             items={[
               {
-                label: model.stereotype === Stereotype.ExternalSystem
-                  ? 'No actions to call yet.'
-                  : 'No actions yet.',
+                label: model.stereotype === Stereotype.ExternalSystem ? 'No actions to call yet.' : 'No actions yet.',
                 value: false,
               },
               {
-                label: model.stereotype === Stereotype.ExternalSystem
-                  ? 'Can call the following actions:'
-                  : 'Can perform the following actions:',
+                label:
+                  model.stereotype === Stereotype.ExternalSystem
+                    ? 'Can call the following actions:'
+                    : 'Can perform the following actions:',
                 value: true,
               },
             ]}
@@ -305,16 +323,14 @@ export function ModelEnglishView({ modelId, model, commands }: ModelEnglishViewP
                   className={cn({ 'inline-block min-w-16': !operation.descriptions[lang]?.name })}
                   content={getName(operation.descriptions)}
                   placeholder="Action name"
-                  onContentChange={(name) =>
-                    rename.renameOperation({ modelId, operationId: operation.id, name })
-                  }
+                  onContentChange={(name) => rename.renameOperation({ modelId, operationId: operation.id, name })}
                 />
                 ,{' '}
                 <Select
                   value={operation.returnType !== null}
                   items={[
                     { label: 'with no result', value: false },
-                    { label: 'giving back' + (operation.returnType ? '' : '...'), value: true },
+                    { label: 'giving back ' + (operation.returnType ? '' : '...'), value: true },
                   ]}
                   onChange={(value) => {
                     commands.editModelOperationReturnType({
@@ -323,12 +339,14 @@ export function ModelEnglishView({ modelId, model, commands }: ModelEnglishViewP
                       returnType: value === false ? null : TypeReference.createModel(null),
                     });
                   }}
-                />
+                />{' '}
                 <MultiplicitySelect
                   language={lang}
                   value={operation.returnMultiplicity}
-                  onChange={(multiplicity) => commands.editModelOperationMultiplicity({ modelId, operationId: operation.id, multiplicity })}
-                />
+                  onChange={(multiplicity) =>
+                    commands.editModelOperationMultiplicity({ modelId, operationId: operation.id, multiplicity })
+                  }
+                />{' '}
                 <TypeReferenceInput
                   value={operation.returnType}
                   typeParameterModelId={model.id}
@@ -356,7 +374,10 @@ export function ModelEnglishView({ modelId, model, commands }: ModelEnglishViewP
                 <DropdownMenu
                   items={[
                     { label: 'Add action', onSelect: () => commands.addModelOperation({ modelId }) },
-                    { label: 'Remove action', onSelect: () => commands.removeModelOperation({ modelId, operationId: operation.id }) },
+                    {
+                      label: 'Remove action',
+                      onSelect: () => commands.removeModelOperation({ modelId, operationId: operation.id }),
+                    },
                   ]}
                 >
                   <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/operation:opacity-100">
@@ -374,7 +395,12 @@ export function ModelEnglishView({ modelId, model, commands }: ModelEnglishViewP
                         content={getName(parameter.descriptions)}
                         placeholder="Input name"
                         onContentChange={(name) =>
-                          rename.renameParameter({ modelId, operationId: operation.id, parameterId: parameter.id, name })
+                          rename.renameParameter({
+                            modelId,
+                            operationId: operation.id,
+                            parameterId: parameter.id,
+                            name,
+                          })
                         }
                       />
                       {': '}
@@ -382,24 +408,45 @@ export function ModelEnglishView({ modelId, model, commands }: ModelEnglishViewP
                         language={lang}
                         value={parameter.multiplicity}
                         onChange={(multiplicity) =>
-                          commands.editModelOperationParameterMultiplicity({ modelId, operationId: operation.id, parameterId: parameter.id, multiplicity })
+                          commands.editModelOperationParameterMultiplicity({
+                            modelId,
+                            operationId: operation.id,
+                            parameterId: parameter.id,
+                            multiplicity,
+                          })
                         }
-                      />
+                      />{' '}
                       <TypeReferenceInput
                         value={parameter.type}
                         typeParameterModelId={model.id}
                         language={lang}
                         onChange={(parameterType) => {
                           if (parameterType !== null) {
-                            commands.editModelOperationParameterType({ modelId, operationId: operation.id, parameterId: parameter.id, parameterType });
+                            commands.editModelOperationParameterType({
+                              modelId,
+                              operationId: operation.id,
+                              parameterId: parameter.id,
+                              parameterType,
+                            });
                           }
                         }}
                       />
                       <DropdownMenu
                         contentClassName="w-36"
                         items={[
-                          { label: 'Add input', onSelect: () => commands.addModelOperationParameter({ modelId, operationId: operation.id }) },
-                          { label: 'Remove input', onSelect: () => commands.removeModelOperationParameter({ modelId, operationId: operation.id, parameterId: parameter.id }) },
+                          {
+                            label: 'Add input',
+                            onSelect: () => commands.addModelOperationParameter({ modelId, operationId: operation.id }),
+                          },
+                          {
+                            label: 'Remove input',
+                            onSelect: () =>
+                              commands.removeModelOperationParameter({
+                                modelId,
+                                operationId: operation.id,
+                                parameterId: parameter.id,
+                              }),
+                          },
                         ]}
                       >
                         <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/parameter:opacity-100">
@@ -457,13 +504,19 @@ export function ModelEnglishView({ modelId, model, commands }: ModelEnglishViewP
                 className={cn({ 'inline-block min-w-8': !enumerationItem.code })}
                 content={enumerationItem.code}
                 placeholder="code"
-                onContentChange={(code) => commands.editModelEnumerationItemCode({ modelId, enumerationItemId: enumerationItem.id, code })}
+                onContentChange={(code) =>
+                  commands.editModelEnumerationItemCode({ modelId, enumerationItemId: enumerationItem.id, code })
+                }
               />
               {'"'}
               <DropdownMenu
                 items={[
                   { label: 'Add item', onSelect: () => commands.addModelEnumerationItem({ modelId }) },
-                  { label: 'Remove item', onSelect: () => commands.removeModelEnumerationItem({ modelId, enumerationItemId: enumerationItem.id }) },
+                  {
+                    label: 'Remove item',
+                    onSelect: () =>
+                      commands.removeModelEnumerationItem({ modelId, enumerationItemId: enumerationItem.id }),
+                  },
                 ]}
               >
                 <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/enumeration-item:opacity-100">

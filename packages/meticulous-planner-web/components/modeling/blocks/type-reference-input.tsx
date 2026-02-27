@@ -15,6 +15,7 @@ export type TypeReferenceInputProps = {
 
 export function TypeReferenceInput(props: TypeReferenceInputProps) {
   const { model } = useModel(props.value?.modelId || null);
+  const labels = LABELS[props.language];
 
   return (
     <span className={cn('', props.className)}>
@@ -24,11 +25,11 @@ export function TypeReferenceInput(props: TypeReferenceInputProps) {
         language={props.language}
         onChange={props.onChange}
       />
-      {(model?.typeParameters.length || 0) > 0 && `，該${model?.descriptions[props.language]?.name}：`}
+      {(model?.typeParameters.length || 0) > 0 && labels.typeParamIntro(model?.descriptions[props.language]?.name ?? '')}
       {model?.typeParameters.map((typeParameter, index) => (
         <Fragment key={typeParameter.id}>
-          {index > 0 && '，'}
-          {typeParameter.descriptions[props.language]?.name}是
+          {index > 0 && labels.separator}
+          {typeParameter.descriptions[props.language]?.name}{labels.isConnector}
           <TypeReferenceInput
             typeParameterModelId={props.typeParameterModelId}
             language={props.language}
@@ -40,3 +41,27 @@ export function TypeReferenceInput(props: TypeReferenceInputProps) {
     </span>
   );
 }
+
+type Labels = {
+  typeParamIntro: (name: string) => string;
+  separator: string;
+  isConnector: string;
+};
+
+const LABELS: Record<Language, Labels> = {
+  [Language.Chinese]: {
+    typeParamIntro: (name) => `，該${name}：`,
+    separator: '，',
+    isConnector: '是',
+  },
+  [Language.English]: {
+    typeParamIntro: () => `, where `,
+    separator: `, `,
+    isConnector: ` is `,
+  },
+  [Language.Technical]: {
+    typeParamIntro: () => `, where `,
+    separator: `, `,
+    isConnector: ` is `,
+  },
+};

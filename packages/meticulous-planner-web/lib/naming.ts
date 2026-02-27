@@ -29,3 +29,11 @@ export function kebabToCamelCase(kebab: string): string {
   const pascal = kebabToPascalCase(kebab);
   return pascal ? pascal.charAt(0).toLowerCase() + pascal.slice(1) : '';
 }
+
+/**
+ * Converts a kebab-case technical name to snake_case.
+ * e.g. "order-number" → "order_number", "place-order" → "place_order"
+ */
+export function kebabToSnakeCase(kebab: string): string {
+  return kebab.replace(/-/g, '_');
+}

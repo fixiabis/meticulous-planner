@@ -1,52 +1,52 @@
 'use client';
 
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { useTranslateModelToTechnical } from '@/hooks/modeling/translation';
 import { cn } from '@/lib/utils';
+import { useModelCodeFile } from '@/hooks/modeling/codegen';
+import { CodegenLanguage } from '@/models/modeling/codegen/types';
 import { ModelId } from '@/models/modeling/values';
 
 export type CodeViewerProps = {
   className?: string;
-  modelId?: ModelId;
-  filePath?: string;
-  code?: string;
+  modelId: ModelId;
 };
 
-export function CodeViewer({ className, modelId, filePath, code }: CodeViewerProps) {
-  const hasApiKey = Boolean(process.env.NEXT_PUBLIC_GEMINI_API_KEY);
-  const { translate, isPending } = useTranslateModelToTechnical(modelId ?? null);
+export function CodeViewer({ className, modelId }: CodeViewerProps) {
+  const [lang, setLang] = useState<CodegenLanguage>('typescript');
+  const { codeFile } = useModelCodeFile(modelId, lang);
 
   return (
     <div className={cn('flex flex-col h-full', className)}>
       <div className="flex items-center justify-between px-3 py-2 border-b shrink-0">
-        <span className="text-xs text-muted-foreground font-mono">{filePath ?? '(尚未命名)'}</span>
-        {modelId && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={!hasApiKey || isPending}
-                  onClick={() => translate()}
-                >
-                  {isPending ? '翻譯中...' : '翻譯名稱'}
-                </Button>
-              </span>
-            </TooltipTrigger>
-            {!hasApiKey && (
-              <TooltipContent>
-                請在 .env.local 設定 NEXT_PUBLIC_GEMINI_API_KEY 以啟用翻譯功能
-              </TooltipContent>
-            )}
-          </Tooltip>
-        )}
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="flex shrink-0">
+            <Button
+              size="sm"
+              variant={lang === 'typescript' ? 'default' : 'ghost'}
+              className="rounded-r-none h-6 px-2 text-xs"
+              onClick={() => setLang('typescript')}
+            >
+              TypeScript
+            </Button>
+            <Button
+              size="sm"
+              variant={lang === 'python' ? 'default' : 'ghost'}
+              className="rounded-l-none h-6 px-2 text-xs border-l"
+              onClick={() => setLang('python')}
+            >
+              Python
+            </Button>
+          </div>
+          <span className="text-xs text-muted-foreground font-mono truncate">
+            {codeFile?.path ?? '(unknown)'}
+          </span>
+        </div>
       </div>
-      {code ? (
+      {codeFile?.code ? (
         <div className="flex-1 overflow-auto bg-muted">
           <pre className="p-4 text-sm font-mono leading-relaxed whitespace-pre">
-            <code>{code}</code>
+            <code>{codeFile.code}</code>
           </pre>
         </div>
       ) : (
