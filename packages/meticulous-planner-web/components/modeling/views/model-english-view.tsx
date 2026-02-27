@@ -12,7 +12,7 @@ import { toTechnicalName } from '@/lib/naming';
 import { cn } from '@/lib/utils';
 import { Model } from '@/models/modeling/model';
 import { TypeReference } from '@/models/modeling/type-reference';
-import { Language, ModelId, Stereotype } from '@/models/modeling/values';
+import { Language, ModelId, OperationStereotype, Stereotype } from '@/models/modeling/values';
 
 export type ModelEnglishViewProps = {
   modelId: ModelId;
@@ -84,7 +84,8 @@ export function ModelEnglishView({ modelId, model, commands }: ModelEnglishViewP
           language={lang}
           value={model.stereotype}
           onChange={(stereotype) => commands.editModelStereotype({ modelId, stereotype })}
-        />{' in '}
+        />
+        {' in '}
         <ServiceSelector
           systemId={model.systemId}
           language={lang}
@@ -281,187 +282,254 @@ export function ModelEnglishView({ modelId, model, commands }: ModelEnglishViewP
         </ul>
       )}
 
-      {model.stereotype !== Stereotype.Enumeration && (
-        <p className="group/operations">
-          <Select
-            value={model.operations.length > 0}
-            onChange={(hasOperation) => {
-              if (hasOperation) {
-                commands.addModelOperation({ modelId });
-              } else {
-                commands.removeAllModelOperations({ modelId });
-              }
-            }}
-            items={[
-              {
-                label: model.stereotype === Stereotype.ExternalSystem ? 'No actions to call yet.' : 'No actions yet.',
-                value: false,
-              },
-              {
-                label:
-                  model.stereotype === Stereotype.ExternalSystem
-                    ? 'Can call the following actions:'
-                    : 'Can perform the following actions:',
-                value: true,
-              },
-            ]}
-          />
-          <DropdownMenu items={[{ label: 'Add action', onSelect: () => commands.addModelOperation({ modelId }) }]}>
-            <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/operations:opacity-100">
-              {' '}
-              ...
-            </span>
-          </DropdownMenu>
-        </p>
-      )}
-      {model.operations.length > 0 && (
-        <ul className="list-disc list-outside pl-6">
-          {model.operations.map((operation) => (
-            <li key={operation.id}>
-              <p className="relative group/operation">
-                <ContentEditable
-                  className={cn({ 'inline-block min-w-16': !operation.descriptions[lang]?.name })}
-                  content={getName(operation.descriptions)}
-                  placeholder="Action name"
-                  onContentChange={(name) => rename.renameOperation({ modelId, operationId: operation.id, name })}
-                />
-                ,{' '}
-                <Select
-                  value={operation.returnType !== null}
-                  items={[
-                    { label: 'with no result', value: false },
-                    { label: 'giving back ' + (operation.returnType ? '' : '...'), value: true },
-                  ]}
-                  onChange={(value) => {
-                    commands.editModelOperationReturnType({
-                      modelId,
-                      operationId: operation.id,
-                      returnType: value === false ? null : TypeReference.createModel(null),
-                    });
-                  }}
-                />{' '}
-                <MultiplicitySelect
-                  language={lang}
-                  value={operation.returnMultiplicity}
-                  onChange={(multiplicity) =>
-                    commands.editModelOperationMultiplicity({ modelId, operationId: operation.id, multiplicity })
-                  }
-                />{' '}
-                <TypeReferenceInput
-                  value={operation.returnType}
-                  typeParameterModelId={model.id}
-                  language={lang}
-                  onChange={(returnType) => {
-                    if (returnType !== null) {
-                      commands.editModelOperationReturnType({ modelId, operationId: operation.id, returnType });
-                    }
-                  }}
-                />{' '}
-                <Select
-                  value={operation.parameters.length > 0}
-                  onChange={(hasParameter) => {
-                    if (hasParameter) {
-                      commands.addModelOperationParameter({ modelId, operationId: operation.id });
-                    } else {
-                      commands.removeAllModelOperationParameters({ modelId, operationId: operation.id });
-                    }
-                  }}
-                  items={[
-                    { label: 'with no inputs', value: false },
-                    { label: 'taking:', value: true },
-                  ]}
-                />
-                <DropdownMenu
-                  items={[
-                    { label: 'Add action', onSelect: () => commands.addModelOperation({ modelId }) },
-                    {
-                      label: 'Remove action',
-                      onSelect: () => commands.removeModelOperation({ modelId, operationId: operation.id }),
-                    },
-                  ]}
-                >
-                  <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/operation:opacity-100">
-                    {' '}
-                    ...
-                  </span>
-                </DropdownMenu>
-              </p>
-              {operation.parameters.length > 0 && (
-                <ul className="list-[circle] list-outside pl-6">
-                  {operation.parameters.map((parameter) => (
-                    <li key={parameter.id} className="relative group/parameter">
-                      <ContentEditable
-                        className={cn({ 'inline-block min-w-16': !parameter.descriptions[lang]?.name })}
-                        content={getName(parameter.descriptions)}
-                        placeholder="Input name"
-                        onContentChange={(name) =>
-                          rename.renameParameter({
-                            modelId,
-                            operationId: operation.id,
-                            parameterId: parameter.id,
-                            name,
-                          })
-                        }
-                      />
-                      {': '}
-                      <MultiplicitySelect
-                        language={lang}
-                        value={parameter.multiplicity}
-                        onChange={(multiplicity) =>
-                          commands.editModelOperationParameterMultiplicity({
-                            modelId,
-                            operationId: operation.id,
-                            parameterId: parameter.id,
-                            multiplicity,
-                          })
-                        }
-                      />{' '}
-                      <TypeReferenceInput
-                        value={parameter.type}
-                        typeParameterModelId={model.id}
-                        language={lang}
-                        onChange={(parameterType) => {
-                          if (parameterType !== null) {
-                            commands.editModelOperationParameterType({
-                              modelId,
-                              operationId: operation.id,
-                              parameterId: parameter.id,
-                              parameterType,
-                            });
-                          }
-                        }}
-                      />
-                      <DropdownMenu
-                        contentClassName="w-36"
-                        items={[
-                          {
-                            label: 'Add input',
-                            onSelect: () => commands.addModelOperationParameter({ modelId, operationId: operation.id }),
-                          },
-                          {
-                            label: 'Remove input',
-                            onSelect: () =>
-                              commands.removeModelOperationParameter({
+      {model.stereotype !== Stereotype.Enumeration &&
+        (() => {
+          const commandOps = model.operations.filter((op) => op.stereotype === OperationStereotype.Command);
+          const queryOps = model.operations.filter((op) => op.stereotype === OperationStereotype.Query);
+
+          type OpSection = {
+            ops: typeof model.operations;
+            stereotype: OperationStereotype;
+            groupKey: string;
+            emptyLabel: string;
+            hasLabel: string;
+            actionWord: string;
+            addLabel: string;
+            removeLabel: string;
+          };
+
+          function renderOperationSection({
+            ops,
+            stereotype,
+            groupKey,
+            emptyLabel,
+            hasLabel,
+            actionWord,
+            addLabel,
+            removeLabel,
+          }: OpSection) {
+            return (
+              <>
+                <p className={`group/${groupKey}`}>
+                  <Select
+                    value={ops.length > 0}
+                    onChange={(has) => {
+                      if (has) {
+                        commands.addModelOperation({ modelId, stereotype });
+                      } else {
+                        commands.removeAllModelOperations({ modelId, stereotype });
+                      }
+                    }}
+                    items={[
+                      { label: emptyLabel, value: false },
+                      { label: hasLabel, value: true },
+                    ]}
+                  />
+                  <DropdownMenu
+                    items={[{ label: addLabel, onSelect: () => commands.addModelOperation({ modelId, stereotype }) }]}
+                  >
+                    <span
+                      className={`cursor-pointer text-muted-foreground opacity-0 group-hover/${groupKey}:opacity-100`}
+                    >
+                      {' '}
+                      ...
+                    </span>
+                  </DropdownMenu>
+                </p>
+                {ops.length > 0 && (
+                  <ul className="list-disc list-outside pl-6">
+                    {ops.map((operation) => (
+                      <li key={operation.id}>
+                        <p className="relative group/operation">
+                          <ContentEditable
+                            className={cn({ 'inline-block min-w-16': !operation.descriptions[lang]?.name })}
+                            content={getName(operation.descriptions)}
+                            placeholder="Action name"
+                            onContentChange={(name) =>
+                              rename.renameOperation({ modelId, operationId: operation.id, name })
+                            }
+                          />
+                          ,{' '}{actionWord}{' '}
+                          <Select
+                            value={operation.returnType !== null}
+                            items={[
+                              { label: 'giving back nothing', value: false },
+                              { label: 'giving back' + (operation.returnType ? '' : '...'), value: true },
+                            ]}
+                            onChange={(value) => {
+                              commands.editModelOperationReturnType({
                                 modelId,
                                 operationId: operation.id,
-                                parameterId: parameter.id,
-                              }),
-                          },
-                        ]}
-                      >
-                        <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/parameter:opacity-100">
-                          {' '}
-                          ...
-                        </span>
-                      </DropdownMenu>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
+                                returnType: value === false ? null : TypeReference.createModel(null),
+                              });
+                            }}
+                          />{' '}
+                          {operation.returnType && (
+                            <MultiplicitySelect
+                              language={lang}
+                              value={operation.returnMultiplicity}
+                              onChange={(multiplicity) =>
+                                commands.editModelOperationMultiplicity({
+                                  modelId,
+                                  operationId: operation.id,
+                                  multiplicity,
+                                })
+                              }
+                            />
+                          )}
+                          {operation.returnType && ' '}
+                          {operation.returnType && (
+                            <TypeReferenceInput
+                              value={operation.returnType}
+                              typeParameterModelId={model.id}
+                              language={lang}
+                              onChange={(returnType) => {
+                                if (returnType !== null) {
+                                  commands.editModelOperationReturnType({
+                                    modelId,
+                                    operationId: operation.id,
+                                    returnType,
+                                  });
+                                }
+                              }}
+                            />
+                          )}
+                          {operation.returnType && ' '}
+                          <Select
+                            value={operation.parameters.length > 0}
+                            onChange={(hasParameter) => {
+                              if (hasParameter) {
+                                commands.addModelOperationParameter({ modelId, operationId: operation.id });
+                              } else {
+                                commands.removeAllModelOperationParameters({ modelId, operationId: operation.id });
+                              }
+                            }}
+                            items={[
+                              { label: 'with no inputs', value: false },
+                              { label: 'taking:', value: true },
+                            ]}
+                          />
+                          <DropdownMenu
+                            items={[
+                              { label: addLabel, onSelect: () => commands.addModelOperation({ modelId, stereotype }) },
+                              {
+                                label: removeLabel,
+                                onSelect: () => commands.removeModelOperation({ modelId, operationId: operation.id }),
+                              },
+                            ]}
+                          >
+                            <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/operation:opacity-100">
+                              {' '}
+                              ...
+                            </span>
+                          </DropdownMenu>
+                        </p>
+                        {operation.parameters.length > 0 && (
+                          <ul className="list-[circle] list-outside pl-6">
+                            {operation.parameters.map((parameter) => (
+                              <li key={parameter.id} className="relative group/parameter">
+                                <ContentEditable
+                                  className={cn({ 'inline-block min-w-16': !parameter.descriptions[lang]?.name })}
+                                  content={getName(parameter.descriptions)}
+                                  placeholder="Input name"
+                                  onContentChange={(name) =>
+                                    rename.renameParameter({
+                                      modelId,
+                                      operationId: operation.id,
+                                      parameterId: parameter.id,
+                                      name,
+                                    })
+                                  }
+                                />
+                                {': '}
+                                <MultiplicitySelect
+                                  language={lang}
+                                  value={parameter.multiplicity}
+                                  onChange={(multiplicity) =>
+                                    commands.editModelOperationParameterMultiplicity({
+                                      modelId,
+                                      operationId: operation.id,
+                                      parameterId: parameter.id,
+                                      multiplicity,
+                                    })
+                                  }
+                                />{' '}
+                                <TypeReferenceInput
+                                  value={parameter.type}
+                                  typeParameterModelId={model.id}
+                                  language={lang}
+                                  onChange={(parameterType) => {
+                                    if (parameterType !== null) {
+                                      commands.editModelOperationParameterType({
+                                        modelId,
+                                        operationId: operation.id,
+                                        parameterId: parameter.id,
+                                        parameterType,
+                                      });
+                                    }
+                                  }}
+                                />
+                                <DropdownMenu
+                                  contentClassName="w-36"
+                                  items={[
+                                    {
+                                      label: 'Add input',
+                                      onSelect: () =>
+                                        commands.addModelOperationParameter({ modelId, operationId: operation.id }),
+                                    },
+                                    {
+                                      label: 'Remove input',
+                                      onSelect: () =>
+                                        commands.removeModelOperationParameter({
+                                          modelId,
+                                          operationId: operation.id,
+                                          parameterId: parameter.id,
+                                        }),
+                                    },
+                                  ]}
+                                >
+                                  <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/parameter:opacity-100">
+                                    {' '}
+                                    ...
+                                  </span>
+                                </DropdownMenu>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </>
+            );
+          }
+
+          return (
+            <>
+              {renderOperationSection({
+                ops: commandOps,
+                stereotype: OperationStereotype.Command,
+                groupKey: 'instructions',
+                emptyLabel: 'No instructions yet.',
+                hasLabel: 'Can give the following instructions:',
+                actionWord: 'after the instruction,',
+                addLabel: 'Add instruction',
+                removeLabel: 'Remove instruction',
+              })}
+              {renderOperationSection({
+                ops: queryOps,
+                stereotype: OperationStereotype.Query,
+                groupKey: 'queries',
+                emptyLabel: 'No queries yet.',
+                hasLabel: 'Can answer the following queries:',
+                actionWord: 'after the query,',
+                addLabel: 'Add query',
+                removeLabel: 'Remove query',
+              })}
+            </>
+          );
+        })()}
 
       {model.stereotype === Stereotype.Enumeration && (
         <p className="group/enumeration-items">

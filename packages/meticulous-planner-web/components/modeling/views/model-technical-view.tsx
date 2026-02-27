@@ -77,7 +77,7 @@ export function ModelTechnicalView({ model }: ModelTechnicalViewProps) {
           {model.operations.map((op) => {
             const paramNames = op.parameters.map((p) => getTechnicalName(p.descriptions) || '—').join(', ');
             const signature = `${getTechnicalName(op.descriptions) || '—'}(${paramNames})`;
-            return <Row key={op.id} label={`  ${signature}`} value={op.returnMultiplicity} />;
+            return <Row key={op.id} label={`  ${signature}`} value={`${op.returnMultiplicity} · ${op.stereotype}`} />;
           })}
         </Section>
       )}

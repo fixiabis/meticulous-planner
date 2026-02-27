@@ -20,6 +20,7 @@ import {
   EditModelOperationParameterMultiplicity,
   EditModelOperationParameterType,
   EditModelOperationReturnType,
+  EditModelOperationStereotype,
   EditModelStereotype,
   EditModelTypeParameterConstraintType,
   EditServiceType,
@@ -67,6 +68,7 @@ import {
   Language,
   ModelId,
   OperationId,
+  OperationStereotype,
   ParameterId,
   ProjectId,
   ServiceId,
@@ -124,6 +126,7 @@ function reviveParameter(raw: Raw): Parameter {
 function reviveOperation(raw: Raw): Operation {
   return new Operation({
     id: raw.id,
+    stereotype: raw.stereotype ?? OperationStereotype.Command,
     parameters: (raw.parameters ?? []).map(reviveParameter),
     returnType: raw.returnType ? reviveTypeReference(raw.returnType) : null,
     returnMultiplicity: raw.returnMultiplicity,
@@ -264,6 +267,7 @@ export interface ModelingService {
   renameModelOperation(command: RenameModelOperation): Promise<Model>;
   editModelOperationReturnType(command: EditModelOperationReturnType): Promise<Model>;
   editModelOperationMultiplicity(command: EditModelOperationMultiplicity): Promise<Model>;
+  editModelOperationStereotype(command: EditModelOperationStereotype): Promise<Model>;
   // Model - Operation - Parameter
   addModelOperationParameter(command: AddModelOperationParameter): Promise<Model>;
   removeModelOperationParameter(command: RemoveModelOperationParameter): Promise<Model>;
@@ -521,7 +525,9 @@ const useModelingStore = create<ModelingStore>()(
       // Model - Operation
 
       async addModelOperation(command) {
-        return updateModel(get, set, command.modelId, (m) => m.addOperation(OperationId(crypto.randomUUID())));
+        return updateModel(get, set, command.modelId, (m) =>
+          m.addOperation(OperationId(crypto.randomUUID()), command.stereotype),
+        );
       },
 
       async removeModelOperation(command) {
@@ -529,7 +535,7 @@ const useModelingStore = create<ModelingStore>()(
       },
 
       async removeAllModelOperations(command) {
-        return updateModel(get, set, command.modelId, (m) => m.removeAllOperation());
+        return updateModel(get, set, command.modelId, (m) => m.removeAllOperationsByStereotype(command.stereotype));
       },
 
       async renameModelOperation(command) {
@@ -547,6 +553,12 @@ const useModelingStore = create<ModelingStore>()(
       async editModelOperationMultiplicity(command) {
         return updateModel(get, set, command.modelId, (m) =>
           m.editOperationMultiplicity(command.operationId, command.multiplicity),
+        );
+      },
+
+      async editModelOperationStereotype(command) {
+        return updateModel(get, set, command.modelId, (m) =>
+          m.editOperationStereotype(command.operationId, command.stereotype),
         );
       },
 

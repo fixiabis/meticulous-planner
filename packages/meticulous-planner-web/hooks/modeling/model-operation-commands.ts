@@ -1,6 +1,6 @@
 import { ModelingCommandType } from '@/models/modeling/messages/commands';
 import { TypeReference } from '@/models/modeling/type-reference';
-import { Language, ModelId, Multiplicity, OperationId, ParameterId } from '@/models/modeling/values';
+import { Language, ModelId, Multiplicity, OperationId, OperationStereotype, ParameterId } from '@/models/modeling/values';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useModelingService } from './modeling-service';
 import { modelKey, systemModelsKey } from './queries';
@@ -10,7 +10,7 @@ export function useAddModelOperation() {
   const queryClient = useQueryClient();
 
   const { mutateAsync: addModelOperation, isPending } = useMutation({
-    mutationFn: (params: { modelId: ModelId }) =>
+    mutationFn: (params: { modelId: ModelId; stereotype: OperationStereotype }) =>
       modelingService.addModelOperation({ type: ModelingCommandType.AddModelOperation, ...params }),
     onSuccess: (model) => {
       queryClient.invalidateQueries({ queryKey: modelKey(model.id) });
@@ -42,7 +42,7 @@ export function useRemoveAllModelOperations() {
   const queryClient = useQueryClient();
 
   const { mutateAsync: removeAllModelOperations, isPending } = useMutation({
-    mutationFn: (params: { modelId: ModelId }) =>
+    mutationFn: (params: { modelId: ModelId; stereotype: OperationStereotype }) =>
       modelingService.removeAllModelOperations({ type: ModelingCommandType.RemoveAllModelOperations, ...params }),
     onSuccess: (model) => {
       queryClient.invalidateQueries({ queryKey: modelKey(model.id) });
@@ -235,4 +235,23 @@ export function useEditModelOperationParameterMultiplicity() {
   });
 
   return { editModelOperationParameterMultiplicity, isPending };
+}
+
+export function useEditModelOperationStereotype() {
+  const modelingService = useModelingService();
+  const queryClient = useQueryClient();
+
+  const { mutateAsync: editModelOperationStereotype, isPending } = useMutation({
+    mutationFn: (params: { modelId: ModelId; operationId: OperationId; stereotype: OperationStereotype }) =>
+      modelingService.editModelOperationStereotype({
+        type: ModelingCommandType.EditModelOperationStereotype,
+        ...params,
+      }),
+    onSuccess: (model) => {
+      queryClient.invalidateQueries({ queryKey: modelKey(model.id) });
+      queryClient.invalidateQueries({ queryKey: systemModelsKey(model.systemId) });
+    },
+  });
+
+  return { editModelOperationStereotype, isPending };
 }

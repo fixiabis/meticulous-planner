@@ -11,7 +11,7 @@ import { ModelCommands } from '@/hooks/modeling/use-model-commands';
 import { cn } from '@/lib/utils';
 import { Model } from '@/models/modeling/model';
 import { TypeReference } from '@/models/modeling/type-reference';
-import { Language, ModelId, Stereotype } from '@/models/modeling/values';
+import { Language, ModelId, OperationStereotype, Stereotype } from '@/models/modeling/values';
 
 export type ModelChineseViewProps = {
   modelId: ModelId;
@@ -112,7 +112,12 @@ export function ModelChineseView({ modelId, model, commands }: ModelChineseViewP
                 content={typeParameter.descriptions[lang]?.name || ''}
                 placeholder="模型資訊名稱"
                 onContentChange={(name) =>
-                  commands.renameModelTypeParameter({ modelId, typeParameterId: typeParameter.id, name, language: lang })
+                  commands.renameModelTypeParameter({
+                    modelId,
+                    typeParameterId: typeParameter.id,
+                    name,
+                    language: lang,
+                  })
                 }
               />
               ：
@@ -136,14 +141,21 @@ export function ModelChineseView({ modelId, model, commands }: ModelChineseViewP
                   typeParameterModelId={model.id}
                   language={lang}
                   onChange={(constraintType) =>
-                    commands.editModelTypeParameterConstraintType({ modelId, typeParameterId: typeParameter.id, constraintType })
+                    commands.editModelTypeParameterConstraintType({
+                      modelId,
+                      typeParameterId: typeParameter.id,
+                      constraintType,
+                    })
                   }
                 />
               )}
               <DropdownMenu
                 items={[
                   { label: '新增模型資訊', onSelect: () => commands.addModelTypeParameter({ modelId }) },
-                  { label: '移除模型資訊', onSelect: () => commands.removeModelTypeParameter({ modelId, typeParameterId: typeParameter.id }) },
+                  {
+                    label: '移除模型資訊',
+                    onSelect: () => commands.removeModelTypeParameter({ modelId, typeParameterId: typeParameter.id }),
+                  },
                 ]}
               >
                 <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/type-parameter:opacity-100">
@@ -195,18 +207,25 @@ export function ModelChineseView({ modelId, model, commands }: ModelChineseViewP
               <MultiplicitySelect
                 language={lang}
                 value={attribute.multiplicity}
-                onChange={(multiplicity) => commands.editModelAttributeMultiplicity({ modelId, attributeId: attribute.id, multiplicity })}
+                onChange={(multiplicity) =>
+                  commands.editModelAttributeMultiplicity({ modelId, attributeId: attribute.id, multiplicity })
+                }
               />
               <TypeReferenceInput
                 value={attribute.type}
                 typeParameterModelId={model.id}
                 language={lang}
-                onChange={(type) => commands.editModelAttributeType({ modelId, attributeId: attribute.id, attributeType: type })}
+                onChange={(type) =>
+                  commands.editModelAttributeType({ modelId, attributeId: attribute.id, attributeType: type })
+                }
               />
               <DropdownMenu
                 items={[
                   { label: '新增資訊', onSelect: () => commands.addModelAttribute({ modelId }) },
-                  { label: '移除資訊', onSelect: () => commands.removeModelAttribute({ modelId, attributeId: attribute.id }) },
+                  {
+                    label: '移除資訊',
+                    onSelect: () => commands.removeModelAttribute({ modelId, attributeId: attribute.id }),
+                  },
                 ]}
               >
                 <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/attribute:opacity-100">
@@ -218,150 +237,254 @@ export function ModelChineseView({ modelId, model, commands }: ModelChineseViewP
           ))}
         </ul>
       )}
-      {model.stereotype !== Stereotype.Enumeration && (
-        <p className="group/operations">
-          <Select
-            value={model.operations.length > 0}
-            onChange={(hasOperation) => {
-              if (hasOperation) {
-                commands.addModelOperation({ modelId });
-              } else {
-                commands.removeAllModelOperations({ modelId });
-              }
-            }}
-            items={[
-              { label: '暫無法' + (model.stereotype === Stereotype.ExternalSystem ? '請' : '對') + '其進行任何操作', value: false },
-              { label: '能' + (model.stereotype === Stereotype.ExternalSystem ? '請' : '對') + '其進行以下操作：', value: true },
-            ]}
-          />
-          <DropdownMenu items={[{ label: '新增操作', onSelect: () => commands.addModelOperation({ modelId }) }]}>
-            <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/operations:opacity-100">
-              {' '}
-              ...
-            </span>
-          </DropdownMenu>
-        </p>
-      )}
-      {model.operations.length > 0 && (
-        <ul className="list-disc list-outside pl-6">
-          {model.operations.map((operation) => (
-            <li key={operation.id}>
-              <p className="relative group/operation">
-                <ContentEditable
-                  className={cn({ 'inline-block min-w-16': !operation.descriptions[lang]?.name })}
-                  content={operation.descriptions[lang]?.name || ''}
-                  placeholder="操作名稱"
-                  onContentChange={(name) =>
-                    commands.renameModelOperation({ modelId, operationId: operation.id, name, language: lang })
-                  }
-                />
-                ，操作後
-                <Select
-                  value={operation.returnType !== null}
-                  items={[
-                    { label: '不會得到任何資訊', value: false },
-                    { label: '會得到' + (operation.returnType ? '' : '...'), value: true },
-                  ]}
-                  onChange={(value) => {
-                    commands.editModelOperationReturnType({
-                      modelId,
-                      operationId: operation.id,
-                      returnType: value === false ? null : TypeReference.createModel(null),
-                    });
-                  }}
-                />
-                <MultiplicitySelect
-                  language={lang}
-                  value={operation.returnMultiplicity}
-                  onChange={(multiplicity) => commands.editModelOperationMultiplicity({ modelId, operationId: operation.id, multiplicity })}
-                />
-                <TypeReferenceInput
-                  value={operation.returnType}
-                  typeParameterModelId={model.id}
-                  language={lang}
-                  onChange={(returnType) => {
-                    if (returnType !== null) {
-                      commands.editModelOperationReturnType({ modelId, operationId: operation.id, returnType });
-                    }
-                  }}
-                />
-                ，
-                <Select
-                  value={operation.parameters.length > 0}
-                  onChange={(hasParameter) => {
-                    if (hasParameter) {
-                      commands.addModelOperationParameter({ modelId, operationId: operation.id });
-                    } else {
-                      commands.removeAllModelOperationParameters({ modelId, operationId: operation.id });
-                    }
-                  }}
-                  items={[
-                    { label: '無需提供任何資訊', value: false },
-                    { label: '需提供以下資訊：', value: true },
-                  ]}
-                />
-                <DropdownMenu
-                  items={[
-                    { label: '新增操作', onSelect: () => commands.addModelOperation({ modelId }) },
-                    { label: '移除操作', onSelect: () => commands.removeModelOperation({ modelId, operationId: operation.id }) },
-                  ]}
-                >
-                  <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/operation:opacity-100">
-                    {' '}
-                    ...
-                  </span>
-                </DropdownMenu>
-              </p>
-              {operation.parameters.length > 0 && (
-                <ul className="list-[circle] list-outside pl-6">
-                  {operation.parameters.map((parameter) => (
-                    <li key={parameter.id} className="relative group/parameter">
-                      <ContentEditable
-                        className={cn({ 'inline-block min-w-16': !parameter.descriptions[lang]?.name })}
-                        content={parameter.descriptions[lang]?.name || ''}
-                        placeholder="資訊名稱"
-                        onContentChange={(name) =>
-                          commands.renameModelOperationParameter({ modelId, operationId: operation.id, parameterId: parameter.id, name, language: lang })
-                        }
-                      />
-                      ：是
-                      <MultiplicitySelect
-                        language={lang}
-                        value={parameter.multiplicity}
-                        onChange={(multiplicity) =>
-                          commands.editModelOperationParameterMultiplicity({ modelId, operationId: operation.id, parameterId: parameter.id, multiplicity })
-                        }
-                      />
-                      <TypeReferenceInput
-                        value={parameter.type}
-                        typeParameterModelId={model.id}
-                        language={lang}
-                        onChange={(parameterType) => {
-                          if (parameterType !== null) {
-                            commands.editModelOperationParameterType({ modelId, operationId: operation.id, parameterId: parameter.id, parameterType });
-                          }
-                        }}
-                      />
-                      <DropdownMenu
-                        contentClassName="w-36"
-                        items={[
-                          { label: '新增操作所需資訊', onSelect: () => commands.addModelOperationParameter({ modelId, operationId: operation.id }) },
-                          { label: '移除操作所需資訊', onSelect: () => commands.removeModelOperationParameter({ modelId, operationId: operation.id, parameterId: parameter.id }) },
-                        ]}
-                      >
-                        <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/parameter:opacity-100">
-                          {' '}
-                          ...
-                        </span>
-                      </DropdownMenu>
-                    </li>
-                  ))}
-                </ul>
+      {model.stereotype !== Stereotype.Enumeration &&
+        (() => {
+          const commandOps = model.operations.filter((op) => op.stereotype === OperationStereotype.Command);
+          const queryOps = model.operations.filter((op) => op.stereotype === OperationStereotype.Query);
+
+          function renderOperationSection(
+            ops: typeof model.operations,
+            stereotype: OperationStereotype,
+            groupKey: string,
+            emptyLabel: string,
+            hasLabel: string,
+            actionWord: string,
+            addLabel: string,
+            removeLabel: string,
+            addParamLabel: string,
+            removeParamLabel: string,
+          ) {
+            return (
+              <>
+                <p className={`group/${groupKey}`}>
+                  <Select
+                    value={ops.length > 0}
+                    onChange={(has) => {
+                      if (has) {
+                        commands.addModelOperation({ modelId, stereotype });
+                      } else {
+                        commands.removeAllModelOperations({ modelId, stereotype });
+                      }
+                    }}
+                    items={[
+                      { label: emptyLabel, value: false },
+                      { label: hasLabel, value: true },
+                    ]}
+                  />
+                  <DropdownMenu
+                    items={[{ label: addLabel, onSelect: () => commands.addModelOperation({ modelId, stereotype }) }]}
+                  >
+                    <span
+                      className={`cursor-pointer text-muted-foreground opacity-0 group-hover/${groupKey}:opacity-100`}
+                    >
+                      {' '}
+                      ...
+                    </span>
+                  </DropdownMenu>
+                </p>
+                {ops.length > 0 && (
+                  <ul className="list-disc list-outside pl-6">
+                    {ops.map((operation) => (
+                      <li key={operation.id}>
+                        <p className="relative group/operation">
+                          <ContentEditable
+                            className={cn({ 'inline-block min-w-16': !operation.descriptions[lang]?.name })}
+                            content={operation.descriptions[lang]?.name || ''}
+                            placeholder="操作名稱"
+                            onContentChange={(name) =>
+                              commands.renameModelOperation({
+                                modelId,
+                                operationId: operation.id,
+                                name,
+                                language: lang,
+                              })
+                            }
+                          />
+                          ，{actionWord}
+                          <Select
+                            value={operation.returnType !== null}
+                            items={[
+                              { label: '不會得到任何資訊', value: false },
+                              { label: '會得到' + (operation.returnType ? '' : '...'), value: true },
+                            ]}
+                            onChange={(value) => {
+                              commands.editModelOperationReturnType({
+                                modelId,
+                                operationId: operation.id,
+                                returnType: value === false ? null : TypeReference.createModel(null),
+                              });
+                            }}
+                          />
+                          {operation.returnType && (
+                            <MultiplicitySelect
+                              language={lang}
+                              value={operation.returnMultiplicity}
+                              onChange={(multiplicity) =>
+                                commands.editModelOperationMultiplicity({
+                                  modelId,
+                                  operationId: operation.id,
+                                  multiplicity,
+                                })
+                              }
+                            />
+                          )}
+                          {operation.returnType && (
+                            <TypeReferenceInput
+                              value={operation.returnType}
+                              typeParameterModelId={model.id}
+                              language={lang}
+                              onChange={(returnType) => {
+                                if (returnType !== null) {
+                                  commands.editModelOperationReturnType({
+                                    modelId,
+                                    operationId: operation.id,
+                                    returnType,
+                                  });
+                                }
+                              }}
+                            />
+                          )}
+                          ，
+                          <Select
+                            value={operation.parameters.length > 0}
+                            onChange={(hasParameter) => {
+                              if (hasParameter) {
+                                commands.addModelOperationParameter({ modelId, operationId: operation.id });
+                              } else {
+                                commands.removeAllModelOperationParameters({ modelId, operationId: operation.id });
+                              }
+                            }}
+                            items={[
+                              { label: '無需提供任何資訊', value: false },
+                              { label: '需提供以下資訊：', value: true },
+                            ]}
+                          />
+                          <DropdownMenu
+                            items={[
+                              { label: addLabel, onSelect: () => commands.addModelOperation({ modelId, stereotype }) },
+                              {
+                                label: removeLabel,
+                                onSelect: () => commands.removeModelOperation({ modelId, operationId: operation.id }),
+                              },
+                            ]}
+                          >
+                            <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/operation:opacity-100">
+                              {' '}
+                              ...
+                            </span>
+                          </DropdownMenu>
+                        </p>
+                        {operation.parameters.length > 0 && (
+                          <ul className="list-[circle] list-outside pl-6">
+                            {operation.parameters.map((parameter) => (
+                              <li key={parameter.id} className="relative group/parameter">
+                                <ContentEditable
+                                  className={cn({ 'inline-block min-w-16': !parameter.descriptions[lang]?.name })}
+                                  content={parameter.descriptions[lang]?.name || ''}
+                                  placeholder="資訊名稱"
+                                  onContentChange={(name) =>
+                                    commands.renameModelOperationParameter({
+                                      modelId,
+                                      operationId: operation.id,
+                                      parameterId: parameter.id,
+                                      name,
+                                      language: lang,
+                                    })
+                                  }
+                                />
+                                ：是
+                                <MultiplicitySelect
+                                  language={lang}
+                                  value={parameter.multiplicity}
+                                  onChange={(multiplicity) =>
+                                    commands.editModelOperationParameterMultiplicity({
+                                      modelId,
+                                      operationId: operation.id,
+                                      parameterId: parameter.id,
+                                      multiplicity,
+                                    })
+                                  }
+                                />
+                                <TypeReferenceInput
+                                  value={parameter.type}
+                                  typeParameterModelId={model.id}
+                                  language={lang}
+                                  onChange={(parameterType) => {
+                                    if (parameterType !== null) {
+                                      commands.editModelOperationParameterType({
+                                        modelId,
+                                        operationId: operation.id,
+                                        parameterId: parameter.id,
+                                        parameterType,
+                                      });
+                                    }
+                                  }}
+                                />
+                                <DropdownMenu
+                                  contentClassName="w-36"
+                                  items={[
+                                    {
+                                      label: addParamLabel,
+                                      onSelect: () =>
+                                        commands.addModelOperationParameter({ modelId, operationId: operation.id }),
+                                    },
+                                    {
+                                      label: removeParamLabel,
+                                      onSelect: () =>
+                                        commands.removeModelOperationParameter({
+                                          modelId,
+                                          operationId: operation.id,
+                                          parameterId: parameter.id,
+                                        }),
+                                    },
+                                  ]}
+                                >
+                                  <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/parameter:opacity-100">
+                                    {' '}
+                                    ...
+                                  </span>
+                                </DropdownMenu>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </>
+            );
+          }
+
+          return (
+            <>
+              {renderOperationSection(
+                commandOps,
+                OperationStereotype.Command,
+                'commands',
+                '暫無法對其下達任何指示',
+                '能對其下達以下指示：',
+                '指示後',
+                '新增指示',
+                '移除指示',
+                '新增指示所需資訊',
+                '移除指示所需資訊',
               )}
-            </li>
-          ))}
-        </ul>
-      )}
+              {renderOperationSection(
+                queryOps,
+                OperationStereotype.Query,
+                'queries',
+                '暫無法向其提出任何詢問',
+                '能向其提出以下詢問：',
+                '詢問後',
+                '新增詢問',
+                '移除詢問',
+                '新增詢問所需資訊',
+                '移除詢問所需資訊',
+              )}
+            </>
+          );
+        })()}
       {model.stereotype === Stereotype.Enumeration && (
         <p className="group/enumeration-items">
           <Select
@@ -395,7 +518,12 @@ export function ModelChineseView({ modelId, model, commands }: ModelChineseViewP
                 content={enumerationItem.descriptions[lang]?.name || ''}
                 placeholder="種類名稱"
                 onContentChange={(name) =>
-                  commands.renameModelEnumerationItem({ modelId, enumerationItemId: enumerationItem.id, name, language: lang })
+                  commands.renameModelEnumerationItem({
+                    modelId,
+                    enumerationItemId: enumerationItem.id,
+                    name,
+                    language: lang,
+                  })
                 }
               />
               ：使用代號「
@@ -403,13 +531,19 @@ export function ModelChineseView({ modelId, model, commands }: ModelChineseViewP
                 className={cn({ 'inline-block min-w-8': !enumerationItem.code })}
                 content={enumerationItem.code}
                 placeholder="代號"
-                onContentChange={(code) => commands.editModelEnumerationItemCode({ modelId, enumerationItemId: enumerationItem.id, code })}
+                onContentChange={(code) =>
+                  commands.editModelEnumerationItemCode({ modelId, enumerationItemId: enumerationItem.id, code })
+                }
               />
               」
               <DropdownMenu
                 items={[
                   { label: '新增種類', onSelect: () => commands.addModelEnumerationItem({ modelId }) },
-                  { label: '移除種類', onSelect: () => commands.removeModelEnumerationItem({ modelId, enumerationItemId: enumerationItem.id }) },
+                  {
+                    label: '移除種類',
+                    onSelect: () =>
+                      commands.removeModelEnumerationItem({ modelId, enumerationItemId: enumerationItem.id }),
+                  },
                 ]}
               >
                 <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/enumeration-item:opacity-100">

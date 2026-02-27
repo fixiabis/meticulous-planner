@@ -71,3 +71,8 @@ export enum ServiceType {
   Core = 'core',
   Adapter = 'adapter',
 }
+
+export enum OperationStereotype {
+  Command = 'command',
+  Query = 'query',
+}

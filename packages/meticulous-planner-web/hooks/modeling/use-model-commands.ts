@@ -26,6 +26,7 @@ import {
   useEditModelOperationParameterMultiplicity,
   useEditModelOperationParameterType,
   useEditModelOperationReturnType,
+  useEditModelOperationStereotype,
   useRemoveAllModelOperationParameters,
   useRemoveAllModelOperations,
   useRemoveModelOperation,
@@ -63,6 +64,7 @@ export function useModelCommands() {
   const { renameModelOperation } = useRenameModelOperation();
   const { editModelOperationReturnType } = useEditModelOperationReturnType();
   const { editModelOperationMultiplicity } = useEditModelOperationMultiplicity();
+  const { editModelOperationStereotype } = useEditModelOperationStereotype();
   const { addModelOperationParameter } = useAddModelOperationParameter();
   const { removeModelOperationParameter } = useRemoveModelOperationParameter();
   const { removeAllModelOperationParameters } = useRemoveAllModelOperationParameters();
@@ -97,6 +99,7 @@ export function useModelCommands() {
     renameModelOperation,
     editModelOperationReturnType,
     editModelOperationMultiplicity,
+    editModelOperationStereotype,
     addModelOperationParameter,
     removeModelOperationParameter,
     removeAllModelOperationParameters,

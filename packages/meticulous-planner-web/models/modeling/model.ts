@@ -13,6 +13,7 @@ import {
   ServiceId,
   Multiplicity,
   OperationId,
+  OperationStereotype,
   ParameterId,
   SystemId,
   Stereotype,
@@ -132,8 +133,8 @@ export class Model implements ModelProps {
     });
   }
 
-  addOperation(operationId: OperationId) {
-    return this.withProps({ operations: [...this.operations, Operation.create({ id: operationId })] });
+  addOperation(operationId: OperationId, stereotype: OperationStereotype) {
+    return this.withProps({ operations: [...this.operations, Operation.create({ id: operationId, stereotype })] });
   }
 
   removeOperation(operationId: OperationId) {
@@ -142,6 +143,10 @@ export class Model implements ModelProps {
 
   removeAllOperation() {
     return this.withProps({ operations: [] });
+  }
+
+  removeAllOperationsByStereotype(stereotype: OperationStereotype) {
+    return this.withProps({ operations: this.operations.filter((op) => op.stereotype !== stereotype) });
   }
 
   renameOperation(operationId: OperationId, name: string, language: Language) {
@@ -154,6 +159,10 @@ export class Model implements ModelProps {
 
   editOperationMultiplicity(operationId: OperationId, multiplicity: Multiplicity) {
     return this.withOperation(operationId, (op) => op.editReturnMultiplicity(multiplicity));
+  }
+
+  editOperationStereotype(operationId: OperationId, stereotype: OperationStereotype) {
+    return this.withOperation(operationId, (op) => op.editStereotype(stereotype));
   }
 
   addOperationParameter(operationId: OperationId, parameterId: ParameterId) {

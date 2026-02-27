@@ -1,5 +1,15 @@
 # Meticulous Planner Web — Project Guide
 
+## 維護說明
+
+**每完成一個有意義的改動後，必須主動更新本檔案（CLAUDE.md）**，將以下內容補充進對應段落：
+- 新增的 enum / type / class 及其語意
+- 新增的 UI 文字規則（labels、actionWord、placeholder 等）
+- 修改的架構決策或設計原則
+- 重要的 backward compat / fallback 規則
+
+---
+
 ## 專案目的
 
 DDD 領域建模工具，讓不懂 DDD 術語的業務人員也能自然使用。
@@ -95,7 +105,10 @@ Project   → 包含多個 Systems
 ### Components（`components/modeling/`）
 | 檔案 | 職責 |
 |---|---|
-| `blocks/model-editor.tsx` | 語言切換器，mount 對應 view |
+| `blocks/model-editor.tsx` | 語言切換器，mount 對應 view（三語 labels） |
+| `blocks/service-selector.tsx` | Service 下拉選擇器（三語 labels） |
+| `blocks/type-reference-selector.tsx` | 型別參考下拉選擇器（三語 labels） |
+| `blocks/type-reference-input.tsx` | 型別參考輸入（含泛型參數；三語 labels） |
 | `views/model-chinese-view.tsx` | 中文編輯 view |
 | `views/model-english-view.tsx` | 英文編輯 view（含 auto-Technical dispatch） |
 | `views/model-technical-view.tsx` | Technical 唯讀 view |
@@ -105,7 +118,7 @@ Project   → 包含多個 Systems
 | `elements/system-type-select.tsx` | SystemType 選擇（三語 labels） |
 | `elements/service-type-select.tsx` | ServiceType 選擇（三語 labels） |
 | `sections/system-sidebar.tsx` | 左側 sidebar（Service + Model 列表） |
-| `blocks/service-editor.tsx` | Service 頁面的 Model 區塊列表 |
+| `blocks/service-editor.tsx` | Service 頁面的 Model 區塊列表（刻意 Chinese-only，無 language prop） |
 
 ### Utilities（`lib/`）
 | 檔案 | 職責 |
@@ -123,12 +136,37 @@ Project   → 包含多個 Systems
 - 用 "actions"（不用 "operations"）、"fields"（不用 "attributes"）
 - 用 "inputs"（不用 "parameters"）、"giving back"（不用 "returns"）
 - 用 "for a specific purpose / for any purpose"（不用 "single-purpose / parameterized"）
+- Instructions / Queries 每項用 actionWord（`after the instruction,` / `after the query,`）接在名稱後，再接統一的 `giving back nothing` / `giving back ...`（平行於中文的「指示後」/「詢問後」結構，避免 "a any number of" 語法錯誤）
 
 **Technical view**：唯讀，給開發者看的 kebab-case identifier
 
-**Select labels** 遵循同樣原則，三語各一套，以 `LABELS[language]` map 管理。
+**所有 UI 字串**（select labels、placeholder、空狀態文字、連接詞、按鈕文字等）遵循同樣原則，三語各一套，以 `LABELS[language]` map 管理。`LABELS` const 放在檔案**最底部**，用 local `type` alias 定義 labels 型別（TypeScript exhaustiveness）。不加 `?? LABELS[Language.Chinese]` fallback（三個 Language 值全覆蓋即可）。
 - AggregateRoot 英文 → "Record"（不用 "Aggregate Root"）
 - Multiplicity Multiple 英文 → "any number of"（不用 "multiple"）
+- ServiceSelector placeholder 英文 → "a service"；TypeReferenceSelector placeholder 英文 → "a model"
+- ModelEditor tab 標籤英文 → "Chinese / English / Technical"；翻譯按鈕英文 → "Translate / Translating..."
+- TypeReferenceInput 連接詞英文 → `, where ` / ` is `（中文 → `，該…：` / `是`）
+- Instructions section 英文 → "No instructions yet." / "Can give the following instructions:"；每項 actionWord → `after the instruction,`
+- Queries section 英文 → "No queries yet." / "Can answer the following queries:"；每項 actionWord → `after the query,`
+- 中文 Instructions → 「暫無法對其下達任何指示」/「能對其下達以下指示：」，每項用「指示後」
+- 中文 Queries → 「暫無法向其提出任何詢問」/「能向其提出以下詢問：」，每項用「詢問後」
+
+---
+
+## Operation Stereotype
+
+每個 Operation 有 `stereotype: OperationStereotype`（`Command` | `Query`），對應 UML `<<command>>` / `<<query>>`：
+
+| Stereotype | 語意 | 中文 UI | 英文 UI |
+|---|---|---|---|
+| `Command` | 改變狀態、不一定有回傳 | 指示 | Instructions |
+| `Query` | 不改變狀態、詢問資訊 | 詢問 | Queries |
+
+**預設值**：`OperationStereotype.Command`（`Operation.create()` 預設，`reviveOperation()` backward compat fallback）
+
+兩個 stereotype 在 view 中各自獨立呈現為一個區塊，支援各自新增 / 清空（`removeAllModelOperations` 按 stereotype 清空）。
+
+Technical view 每個 operation row 顯示 `returnMultiplicity · stereotype`。
 
 ---
 

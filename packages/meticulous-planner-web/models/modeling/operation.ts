@@ -1,10 +1,11 @@
 import { Description } from './description';
 import { Parameter } from './parameter';
 import { TypeReference } from './type-reference';
-import { Language, Multiplicity, OperationId, ParameterId } from './values';
+import { Language, Multiplicity, OperationId, OperationStereotype, ParameterId } from './values';
 
 export type OperationProps = {
   readonly id: OperationId;
+  readonly stereotype: OperationStereotype;
   readonly parameters: readonly Parameter[];
   readonly returnType: TypeReference | null;
   readonly returnMultiplicity: Multiplicity;
@@ -17,6 +18,7 @@ export type CreateOperationProps = Partial<OperationProps> & Pick<OperationProps
 
 export class Operation implements OperationProps {
   readonly id: OperationId;
+  readonly stereotype: OperationStereotype;
   readonly parameters: readonly Parameter[];
   readonly returnType: TypeReference | null;
   readonly returnMultiplicity: Multiplicity;
@@ -24,6 +26,7 @@ export class Operation implements OperationProps {
 
   constructor(props: OperationProps) {
     this.id = props.id;
+    this.stereotype = props.stereotype;
     this.parameters = props.parameters;
     this.returnType = props.returnType;
     this.returnMultiplicity = props.returnMultiplicity;
@@ -33,6 +36,7 @@ export class Operation implements OperationProps {
   static create(props: CreateOperationProps) {
     return new Operation({
       id: props.id,
+      stereotype: props.stereotype ?? OperationStereotype.Command,
       parameters: props.parameters ?? [],
       returnType: props.returnType ?? null,
       returnMultiplicity: props.returnMultiplicity ?? Multiplicity.Single,
@@ -48,6 +52,10 @@ export class Operation implements OperationProps {
     return this.withProps({
       descriptions: { ...this.descriptions, [language]: Description.create({ name, language }) },
     });
+  }
+
+  editStereotype(stereotype: OperationStereotype) {
+    return this.withProps({ stereotype });
   }
 
   editReturnType(returnType: TypeReference | null) {

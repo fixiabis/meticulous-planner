@@ -9,6 +9,7 @@ import {
   ServiceType,
   Multiplicity,
   OperationId,
+  OperationStereotype,
   ParameterId,
   SystemId,
   SystemType,
@@ -48,6 +49,7 @@ export enum ModelingCommandType {
   RenameModelOperation = 'rename-model-operation',
   EditModelOperationReturnType = 'edit-model-operation-return-type',
   EditModelOperationMultiplicity = 'edit-model-operation-multiplicity',
+  EditModelOperationStereotype = 'edit-model-operation-stereotype',
   // Model - Operation - Parameter
   AddModelOperationParameter = 'add-model-operation-parameter',
   RemoveModelOperationParameter = 'remove-model-operation-parameter',
@@ -209,6 +211,7 @@ export type EditModelAttributeMultiplicity = {
 export type AddModelOperation = {
   readonly type: ModelingCommandType.AddModelOperation;
   readonly modelId: ModelId;
+  readonly stereotype: OperationStereotype;
 };
 
 export type RemoveModelOperation = {
@@ -220,6 +223,14 @@ export type RemoveModelOperation = {
 export type RemoveAllModelOperations = {
   readonly type: ModelingCommandType.RemoveAllModelOperations;
   readonly modelId: ModelId;
+  readonly stereotype: OperationStereotype;
+};
+
+export type EditModelOperationStereotype = {
+  readonly type: ModelingCommandType.EditModelOperationStereotype;
+  readonly modelId: ModelId;
+  readonly operationId: OperationId;
+  readonly stereotype: OperationStereotype;
 };
 
 export type RenameModelOperation = {
@@ -379,6 +390,7 @@ export type ModelingCommand =
   | RenameModelOperation
   | EditModelOperationReturnType
   | EditModelOperationMultiplicity
+  | EditModelOperationStereotype
   | AddModelOperationParameter
   | RemoveModelOperationParameter
   | RemoveAllModelOperationParameters
