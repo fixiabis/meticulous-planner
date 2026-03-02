@@ -3,7 +3,7 @@
 import { use } from 'react';
 import { useRouter } from 'next/navigation';
 import { ModelEditor } from '@/components/modeling/blocks/model-editor';
-import { CodeViewer } from '@/components/modeling/elements/code-viewer';
+import { CodeViewer } from '@/components/modeling/blocks/code-viewer';
 import { Button } from '@/components/ui/button';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { ScrollArea } from '@/components/ui/scroll-area';

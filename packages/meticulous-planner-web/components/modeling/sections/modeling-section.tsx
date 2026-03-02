@@ -1,7 +1,7 @@
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { cn } from '@/lib/utils';
 import { ModelEditor } from '../blocks/model-editor';
-import { CodeViewer } from '../elements/code-viewer';
+import { CodeViewer } from '../blocks/code-viewer';
 import { ModelId } from '@/models/modeling/values';
 
 export type ModelingSectionProps = {

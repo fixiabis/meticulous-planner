@@ -43,7 +43,7 @@ const LABELS: Record<Language, Record<Multiplicity, string>> = {
   [Language.Technical]: {
     [Multiplicity.Single]: 'single',
     [Multiplicity.Optional]: 'optional',
-    [Multiplicity.Multiple]: 'any number of',
+    [Multiplicity.Multiple]: 'any-number-of',
     [Multiplicity.AtLeastOne]: 'one-or-more',
   },
 };
