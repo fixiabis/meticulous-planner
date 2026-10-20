@@ -68,10 +68,7 @@ export default function Page() {
                   { label: '載入範例', onSelect: handleLoadExample },
                 ]}
               >
-                <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/project:opacity-100">
-                  {' '}
-                  ...
-                </span>
+                <MoreTrigger className="opacity-0 group-hover/project:opacity-100" />
               </DropdownMenu>
             </li>
           ))}

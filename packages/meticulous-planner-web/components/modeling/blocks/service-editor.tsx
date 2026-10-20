@@ -92,10 +92,7 @@ export function ServiceEditor({ systemId, serviceId }: ServiceEditorProps) {
                   { label: '新增模型', onSelect: handleAddModel },
                 ]}
               >
-                <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/model:opacity-100">
-                  {' '}
-                  ...
-                </span>
+                <MoreTrigger className="opacity-0 group-hover/model:opacity-100" />
               </DropdownMenu>
             </li>
           ))}

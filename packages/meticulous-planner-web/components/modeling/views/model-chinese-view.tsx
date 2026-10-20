@@ -97,10 +97,7 @@ export function ModelChineseView({ modelId, model, commands }: ModelChineseViewP
           <DropdownMenu
             items={[{ label: '新增模型資訊', onSelect: () => commands.addModelTypeParameter({ modelId }) }]}
           >
-            <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/type-parameters:opacity-100">
-              {' '}
-              ...
-            </span>
+            <MoreTrigger className="opacity-0 group-hover/type-parameters:opacity-100" />
           </DropdownMenu>
         </p>
       )}
@@ -159,10 +156,7 @@ export function ModelChineseView({ modelId, model, commands }: ModelChineseViewP
                   },
                 ]}
               >
-                <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/type-parameter:opacity-100">
-                  {' '}
-                  ...
-                </span>
+                <MoreTrigger className="opacity-0 group-hover/type-parameter:opacity-100" />
               </DropdownMenu>
             </li>
           ))}
@@ -229,10 +223,7 @@ export function ModelChineseView({ modelId, model, commands }: ModelChineseViewP
                   },
                 ]}
               >
-                <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/attribute:opacity-100">
-                  {' '}
-                  ...
-                </span>
+                <MoreTrigger className="opacity-0 group-hover/attribute:opacity-100" />
               </DropdownMenu>
             </li>
           ))}
@@ -367,10 +358,7 @@ export function ModelChineseView({ modelId, model, commands }: ModelChineseViewP
                               },
                             ]}
                           >
-                            <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/operation:opacity-100">
-                              {' '}
-                              ...
-                            </span>
+                            <MoreTrigger className="opacity-0 group-hover/operation:opacity-100" />
                           </DropdownMenu>
                         </p>
                         {operation.parameters.length > 0 && (
@@ -438,10 +426,7 @@ export function ModelChineseView({ modelId, model, commands }: ModelChineseViewP
                                     },
                                   ]}
                                 >
-                                  <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/parameter:opacity-100">
-                                    {' '}
-                                    ...
-                                  </span>
+                                  <MoreTrigger className="opacity-0 group-hover/parameter:opacity-100" />
                                 </DropdownMenu>
                               </li>
                             ))}
@@ -545,10 +530,7 @@ export function ModelChineseView({ modelId, model, commands }: ModelChineseViewP
                   },
                 ]}
               >
-                <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/enumeration-item:opacity-100">
-                  {' '}
-                  ...
-                </span>
+                <MoreTrigger className="opacity-0 group-hover/enumeration-item:opacity-100" />
               </DropdownMenu>
             </li>
           ))}

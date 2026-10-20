@@ -144,10 +144,7 @@ export function ModelEnglishView({ modelId, model, commands }: ModelEnglishViewP
           <DropdownMenu
             items={[{ label: 'Add type input', onSelect: () => commands.addModelTypeParameter({ modelId }) }]}
           >
-            <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/type-parameters:opacity-100">
-              {' '}
-              ...
-            </span>
+            <MoreTrigger className="opacity-0 group-hover/type-parameters:opacity-100" />
           </DropdownMenu>
         </p>
       )}
@@ -204,10 +201,7 @@ export function ModelEnglishView({ modelId, model, commands }: ModelEnglishViewP
                   },
                 ]}
               >
-                <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/type-parameter:opacity-100">
-                  {' '}
-                  ...
-                </span>
+                <MoreTrigger className="opacity-0 group-hover/type-parameter:opacity-100" />
               </DropdownMenu>
             </li>
           ))}
@@ -273,10 +267,7 @@ export function ModelEnglishView({ modelId, model, commands }: ModelEnglishViewP
                   },
                 ]}
               >
-                <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/attribute:opacity-100">
-                  {' '}
-                  ...
-                </span>
+                <MoreTrigger className="opacity-0 group-hover/attribute:opacity-100" />
               </DropdownMenu>
             </li>
           ))}
@@ -417,10 +408,7 @@ export function ModelEnglishView({ modelId, model, commands }: ModelEnglishViewP
                               },
                             ]}
                           >
-                            <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/operation:opacity-100">
-                              {' '}
-                              ...
-                            </span>
+                            <MoreTrigger className="opacity-0 group-hover/operation:opacity-100" />
                           </DropdownMenu>
                         </p>
                         {operation.parameters.length > 0 && (
@@ -487,10 +475,7 @@ export function ModelEnglishView({ modelId, model, commands }: ModelEnglishViewP
                                     },
                                   ]}
                                 >
-                                  <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/parameter:opacity-100">
-                                    {' '}
-                                    ...
-                                  </span>
+                                  <MoreTrigger className="opacity-0 group-hover/parameter:opacity-100" />
                                 </DropdownMenu>
                               </li>
                             ))}
@@ -586,10 +571,7 @@ export function ModelEnglishView({ modelId, model, commands }: ModelEnglishViewP
                   },
                 ]}
               >
-                <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/enumeration-item:opacity-100">
-                  {' '}
-                  ...
-                </span>
+                <MoreTrigger className="opacity-0 group-hover/enumeration-item:opacity-100" />
               </DropdownMenu>
             </li>
           ))}

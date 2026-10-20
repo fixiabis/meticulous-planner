@@ -63,10 +63,7 @@ export default function ProjectPage({ params }: { params: Promise<{ projectId: s
                   { label: '新增系統', onSelect: handleAddSystem },
                 ]}
               >
-                <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/system:opacity-100">
-                  {' '}
-                  ...
-                </span>
+                <MoreTrigger className="opacity-0 group-hover/system:opacity-100" />
               </DropdownMenu>
             </li>
           ))}
