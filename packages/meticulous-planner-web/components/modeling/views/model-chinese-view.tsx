@@ -9,7 +9,6 @@ import { TypeReferenceInput } from '@/components/modeling/blocks/type-reference-
 import { MultiplicitySelect } from '@/components/modeling/elements/multiplicity-select';
 import { StereotypeSelect } from '@/components/modeling/elements/stereotype-select';
 import { ModelCommands } from '@/hooks/modeling/use-model-commands';
-import { cn } from '@/lib/utils';
 import { Model } from '@/models/modeling/model';
 import { TypeReference } from '@/models/modeling/type-reference';
 import { Language, ModelId, OperationStereotype, Stereotype } from '@/models/modeling/values';
@@ -27,7 +26,6 @@ export function ModelChineseView({ modelId, model, commands }: ModelChineseViewP
     <div className="space-y-1">
       <h1 className="text-2xl font-bold mb-2">
         <ContentEditable
-          className={cn({ 'inline-block min-w-24': !model.descriptions[lang]?.name })}
           content={model.descriptions[lang]?.name || ''}
           placeholder="模型名稱"
           onContentChange={(name) => {
@@ -106,7 +104,6 @@ export function ModelChineseView({ modelId, model, commands }: ModelChineseViewP
           {model.typeParameters.map((typeParameter) => (
             <li key={typeParameter.id} className="relative group/type-parameter">
               <ContentEditable
-                className={cn({ 'inline-block min-w-24': !typeParameter.descriptions[lang]?.name })}
                 content={typeParameter.descriptions[lang]?.name || ''}
                 placeholder="模型資訊名稱"
                 onContentChange={(name) =>
@@ -191,7 +188,6 @@ export function ModelChineseView({ modelId, model, commands }: ModelChineseViewP
           {model.attributes.map((attribute) => (
             <li key={attribute.id} className="relative group/attribute">
               <ContentEditable
-                className={cn({ 'inline-block min-w-16': !attribute.descriptions[lang]?.name })}
                 content={attribute.descriptions[lang]?.name || ''}
                 placeholder="資訊名稱"
                 onContentChange={(name) =>
@@ -278,7 +274,6 @@ export function ModelChineseView({ modelId, model, commands }: ModelChineseViewP
                       <li key={operation.id}>
                         <p className="relative group/operation">
                           <ContentEditable
-                            className={cn({ 'inline-block min-w-16': !operation.descriptions[lang]?.name })}
                             content={operation.descriptions[lang]?.name || ''}
                             placeholder="操作名稱"
                             onContentChange={(name) =>
@@ -366,7 +361,6 @@ export function ModelChineseView({ modelId, model, commands }: ModelChineseViewP
                             {operation.parameters.map((parameter) => (
                               <li key={parameter.id} className="relative group/parameter">
                                 <ContentEditable
-                                  className={cn({ 'inline-block min-w-16': !parameter.descriptions[lang]?.name })}
                                   content={parameter.descriptions[lang]?.name || ''}
                                   placeholder="資訊名稱"
                                   onContentChange={(name) =>
@@ -498,7 +492,6 @@ export function ModelChineseView({ modelId, model, commands }: ModelChineseViewP
           {model.enumerationItems.map((enumerationItem) => (
             <li key={enumerationItem.id} className="relative group/enumeration-item">
               <ContentEditable
-                className={cn({ 'inline-block min-w-16': !enumerationItem.descriptions[lang]?.name })}
                 content={enumerationItem.descriptions[lang]?.name || ''}
                 placeholder="種類名稱"
                 onContentChange={(name) =>
@@ -512,7 +505,6 @@ export function ModelChineseView({ modelId, model, commands }: ModelChineseViewP
               />
               ：使用代號「
               <ContentEditable
-                className={cn({ 'inline-block min-w-8': !enumerationItem.code })}
                 content={enumerationItem.code}
                 placeholder="代號"
                 onContentChange={(code) =>

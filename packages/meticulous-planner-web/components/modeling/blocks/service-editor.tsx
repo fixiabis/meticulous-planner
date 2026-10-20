@@ -42,7 +42,6 @@ export function ServiceEditor({ systemId, serviceId }: ServiceEditorProps) {
     <div className="p-4 space-y-1">
       <h1 className="text-2xl font-bold mb-2">
         <ContentEditable
-          className={service?.descriptions[Language.Chinese]?.name ? '' : 'inline-block min-w-32'}
           content={service?.descriptions[Language.Chinese]?.name ?? ''}
           placeholder="服務名稱"
           onContentChange={(name) => {

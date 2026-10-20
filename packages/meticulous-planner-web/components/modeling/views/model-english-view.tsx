@@ -10,7 +10,6 @@ import { MultiplicitySelect } from '@/components/modeling/elements/multiplicity-
 import { StereotypeSelect } from '@/components/modeling/elements/stereotype-select';
 import { ModelCommands } from '@/hooks/modeling/use-model-commands';
 import { toTechnicalName } from '@/lib/naming';
-import { cn } from '@/lib/utils';
 import { Model } from '@/models/modeling/model';
 import { TypeReference } from '@/models/modeling/type-reference';
 import { Language, ModelId, OperationStereotype, Stereotype } from '@/models/modeling/values';
@@ -69,7 +68,6 @@ export function ModelEnglishView({ modelId, model, commands }: ModelEnglishViewP
     <div className="space-y-1">
       <h1 className="text-2xl font-bold mb-2">
         <ContentEditable
-          className={cn({ 'inline-block min-w-24': !model.descriptions[lang]?.name })}
           content={getName(model.descriptions)}
           placeholder="Model name"
           onContentChange={(name) => {
@@ -153,7 +151,6 @@ export function ModelEnglishView({ modelId, model, commands }: ModelEnglishViewP
           {model.typeParameters.map((typeParameter) => (
             <li key={typeParameter.id} className="relative group/type-parameter">
               <ContentEditable
-                className={cn({ 'inline-block min-w-24': !typeParameter.descriptions[lang]?.name })}
                 content={getName(typeParameter.descriptions)}
                 placeholder="Type input name"
                 onContentChange={(name) =>
@@ -237,7 +234,6 @@ export function ModelEnglishView({ modelId, model, commands }: ModelEnglishViewP
           {model.attributes.map((attribute) => (
             <li key={attribute.id} className="relative group/attribute">
               <ContentEditable
-                className={cn({ 'inline-block min-w-16': !attribute.descriptions[lang]?.name })}
                 content={getName(attribute.descriptions)}
                 placeholder="Field name"
                 onContentChange={(name) => rename.renameAttribute({ modelId, attributeId: attribute.id, name })}
@@ -332,7 +328,6 @@ export function ModelEnglishView({ modelId, model, commands }: ModelEnglishViewP
                       <li key={operation.id}>
                         <p className="relative group/operation">
                           <ContentEditable
-                            className={cn({ 'inline-block min-w-16': !operation.descriptions[lang]?.name })}
                             content={getName(operation.descriptions)}
                             placeholder="Action name"
                             onContentChange={(name) =>
@@ -416,7 +411,6 @@ export function ModelEnglishView({ modelId, model, commands }: ModelEnglishViewP
                             {operation.parameters.map((parameter) => (
                               <li key={parameter.id} className="relative group/parameter">
                                 <ContentEditable
-                                  className={cn({ 'inline-block min-w-16': !parameter.descriptions[lang]?.name })}
                                   content={getName(parameter.descriptions)}
                                   placeholder="Input name"
                                   onContentChange={(name) =>
@@ -544,7 +538,6 @@ export function ModelEnglishView({ modelId, model, commands }: ModelEnglishViewP
           {model.enumerationItems.map((enumerationItem) => (
             <li key={enumerationItem.id} className="relative group/enumeration-item">
               <ContentEditable
-                className={cn({ 'inline-block min-w-16': !enumerationItem.descriptions[lang]?.name })}
                 content={getName(enumerationItem.descriptions)}
                 placeholder="Item name"
                 onContentChange={(name) =>
@@ -553,7 +546,6 @@ export function ModelEnglishView({ modelId, model, commands }: ModelEnglishViewP
               />
               {', code: "'}
               <ContentEditable
-                className={cn({ 'inline-block min-w-8': !enumerationItem.code })}
                 content={enumerationItem.code}
                 placeholder="code"
                 onContentChange={(code) =>

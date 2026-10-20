@@ -172,6 +172,14 @@ Project   → 包含多個 Systems
 
 ---
 
+## 文字編輯（`components/base/content-editable.tsx`）
+
+- 外層 `inline-grid`，可編輯區與 placeholder 疊在同一個 grid cell（placeholder 為 `pointer-events-none` 的 sibling，不再用 `::after`）
+- 尚無內容時容器寬度跟隨 placeholder 文字；打入第一個字後 placeholder 移除，寬度跟隨輸入文字；最少 `1em`
+- 呼叫端**不需要**再傳 `inline-block min-w-*` 之類的補寬 className
+
+---
+
 ## Operation Stereotype
 
 每個 Operation 有 `stereotype: OperationStereotype`（`Command` | `Query`），對應 UML `<<command>>` / `<<query>>`：

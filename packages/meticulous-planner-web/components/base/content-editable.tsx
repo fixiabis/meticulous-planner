@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { CSSProperties, forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 
 function escapeHtml(text: string): string {
   const div = document.createElement('div');
@@ -27,7 +27,6 @@ export type ContentEditableProps = {
 
 export const ContentEditable = forwardRef<HTMLDivElement, ContentEditableProps>(function ContentEditable(props, ref) {
   const editorRef = useRef<HTMLDivElement>(null);
-  const [isEditing, setIsEditing] = useState(false);
   const [editingContent, setEditingContent] = useState(props.content);
 
   useImperativeHandle(ref, () => editorRef.current!);
@@ -42,7 +41,6 @@ export const ContentEditable = forwardRef<HTMLDivElement, ContentEditableProps>(
       editorRef.current.innerHTML = '&nbsp;';
       selectAllContent(editorRef.current);
     }
-    setIsEditing(true);
     props.onEditStart?.();
   };
 
@@ -67,7 +65,6 @@ export const ContentEditable = forwardRef<HTMLDivElement, ContentEditableProps>(
   };
 
   const handleBlur = () => {
-    setIsEditing(false);
     props.onEditEnd?.();
     props.onContentChange?.(editingContent);
 
@@ -76,30 +73,27 @@ export const ContentEditable = forwardRef<HTMLDivElement, ContentEditableProps>(
     }
   };
 
+  // 可編輯區與 placeholder 疊在同一個 grid cell：尚無內容時容器寬度跟隨 placeholder，有內容後跟隨文字，最少 1em
   return (
-    <span
-      ref={editorRef}
-      tabIndex={0}
-      contentEditable="plaintext-only"
-      suppressContentEditableWarning
-      className={cn(
-        'relative inline isolate cursor-text',
-        '[&:after]:content-(--placeholder) [&:after]:opacity-30 [&:after]:whitespace-pre-wrap',
-        editingContent !== '' || isEditing
-          ? '[&:after]:absolute [&:after]:block [&:after]:top-0 [&:after]:left-0 [&:after]:w-full [&:after]:h-full [&:after]:-z-10'
-          : '',
-        props.className,
+    <span className={cn('inline-grid align-baseline', props.className)}>
+      <span
+        ref={editorRef}
+        tabIndex={0}
+        contentEditable="plaintext-only"
+        suppressContentEditableWarning
+        className="col-start-1 row-start-1 min-w-[1em] cursor-text whitespace-pre-wrap"
+        onInput={handleInput}
+        onClick={handleClick}
+        onBlur={handleBlur}
+      />
+      {editingContent === '' && props.placeholder && (
+        <span
+          aria-hidden
+          className="col-start-1 row-start-1 pointer-events-none select-none whitespace-pre-wrap opacity-30"
+        >
+          {props.placeholder}
+        </span>
       )}
-      style={
-        {
-          '--placeholder': `"${
-            editingContent !== '' ? '' : props.placeholder?.replace(/"/g, '\\"').replace(/\n/g, '\\A') || ''
-          }"`,
-        } as CSSProperties
-      }
-      onInput={handleInput}
-      onClick={handleClick}
-      onBlur={handleBlur}
-    />
+    </span>
   );
 });
