@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { ContentEditable } from '@/components/base/content-editable';
 import { DropdownMenu } from '@/components/base/dropdown-menu';
+import { MoreTrigger } from '@/components/base/more-trigger';
 import { ServiceTypeSelect } from '@/components/modeling/elements/service-type-select';
 import { useSystemModels, useSystemServices } from '@/hooks/modeling/queries';
 import { useAddModel, useRenameModel } from '@/hooks/modeling/model-commands';
@@ -62,9 +63,11 @@ export function ServiceEditor({ systemId, serviceId }: ServiceEditorProps) {
         </p>
       )}
       <p className="group/models">
-        {serviceModels.length === 0 ? '暫無任何模型' : '包含以下模型：'}
+        {serviceModels.length > 0 && '包含以下模型：'}
         <DropdownMenu items={[{ label: '新增模型', onSelect: handleAddModel }]}>
-          <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/models:opacity-100"> ...</span>
+          <MoreTrigger pinned={serviceModels.length === 0} className="opacity-0 group-hover/models:opacity-100">
+            暫無任何模型
+          </MoreTrigger>
         </DropdownMenu>
       </p>
       {serviceModels.length > 0 && (

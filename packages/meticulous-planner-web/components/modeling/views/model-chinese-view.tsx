@@ -2,6 +2,7 @@
 
 import { ContentEditable } from '@/components/base/content-editable';
 import { DropdownMenu } from '@/components/base/dropdown-menu';
+import { MoreTrigger } from '@/components/base/more-trigger';
 import { Select } from '@/components/base/select';
 import { ServiceSelector } from '@/components/modeling/blocks/service-selector';
 import { TypeReferenceInput } from '@/components/modeling/blocks/type-reference-input';
@@ -184,10 +185,10 @@ export function ModelChineseView({ modelId, model, commands }: ModelChineseViewP
             ]}
           />
           <DropdownMenu items={[{ label: '新增資訊', onSelect: () => commands.addModelAttribute({ modelId }) }]}>
-            <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/attributes:opacity-100">
-              {' '}
-              ...
-            </span>
+            <MoreTrigger
+              pinned={model.attributes.length === 0}
+              className="opacity-0 group-hover/attributes:opacity-100"
+            />
           </DropdownMenu>
         </p>
       )}
@@ -274,12 +275,10 @@ export function ModelChineseView({ modelId, model, commands }: ModelChineseViewP
                   <DropdownMenu
                     items={[{ label: addLabel, onSelect: () => commands.addModelOperation({ modelId, stereotype }) }]}
                   >
-                    <span
-                      className={`cursor-pointer text-muted-foreground opacity-0 group-hover/${groupKey}:opacity-100`}
-                    >
-                      {' '}
-                      ...
-                    </span>
+                    <MoreTrigger
+                      pinned={ops.length === 0}
+                      className={`opacity-0 group-hover/${groupKey}:opacity-100`}
+                    />
                   </DropdownMenu>
                 </p>
                 {ops.length > 0 && (
@@ -502,10 +501,10 @@ export function ModelChineseView({ modelId, model, commands }: ModelChineseViewP
             ]}
           />
           <DropdownMenu items={[{ label: '新增種類', onSelect: () => commands.addModelEnumerationItem({ modelId }) }]}>
-            <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/enumeration-items:opacity-100">
-              {' '}
-              ...
-            </span>
+            <MoreTrigger
+              pinned={model.enumerationItems.length === 0}
+              className="opacity-0 group-hover/enumeration-items:opacity-100"
+            />
           </DropdownMenu>
         </p>
       )}

@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { ContentEditable } from '@/components/base/content-editable';
 import { DropdownMenu } from '@/components/base/dropdown-menu';
+import { MoreTrigger } from '@/components/base/more-trigger';
 import { useProjects } from '@/hooks/modeling/queries';
 import { useAddProject, useLoadExample, useRenameProject } from '@/hooks/modeling/project-commands';
 import { Language, ProjectId } from '@/models/modeling/values';
@@ -32,17 +33,16 @@ export default function Page() {
     <div className="max-w-2xl mx-auto py-8 px-4 space-y-1">
       <h1 className="text-2xl font-bold mb-2">各專案</h1>
       <p className="group/projects">
-        {projects.length === 0 ? '暫無任何專案' : '目前已建立以下專案：'}
+        {projects.length > 0 && '目前已建立以下專案：'}
         <DropdownMenu
           items={[
             { label: '新增專案', onSelect: handleAddProject },
             { label: '載入範例', onSelect: handleLoadExample },
           ]}
         >
-          <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/projects:opacity-100">
-            {' '}
-            ...
-          </span>
+          <MoreTrigger pinned={projects.length === 0} className="opacity-0 group-hover/projects:opacity-100">
+            暫無任何專案
+          </MoreTrigger>
         </DropdownMenu>
       </p>
       {projects.length > 0 && (

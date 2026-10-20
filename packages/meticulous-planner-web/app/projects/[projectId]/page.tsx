@@ -4,6 +4,7 @@ import { use } from 'react';
 import { useRouter } from 'next/navigation';
 import { ContentEditable } from '@/components/base/content-editable';
 import { DropdownMenu } from '@/components/base/dropdown-menu';
+import { MoreTrigger } from '@/components/base/more-trigger';
 import { useProject, useProjectSystems } from '@/hooks/modeling/queries';
 import { useAddSystem, useRenameSystem } from '@/hooks/modeling/system-commands';
 import { Language, ProjectId } from '@/models/modeling/values';
@@ -33,12 +34,11 @@ export default function ProjectPage({ params }: { params: Promise<{ projectId: s
         {project?.descriptions[Language.Chinese]?.name || '未命名專案'}
       </h1>
       <p className="group/systems">
-        {systems.length === 0 ? '暫無任何系統' : '目前已建立以下系統：'}
+        {systems.length > 0 && '目前已建立以下系統：'}
         <DropdownMenu items={[{ label: '新增系統', onSelect: handleAddSystem }]}>
-          <span className="cursor-pointer text-muted-foreground opacity-0 group-hover/systems:opacity-100">
-            {' '}
-            ...
-          </span>
+          <MoreTrigger pinned={systems.length === 0} className="opacity-0 group-hover/systems:opacity-100">
+            暫無任何系統
+          </MoreTrigger>
         </DropdownMenu>
       </p>
       {systems.length > 0 && (

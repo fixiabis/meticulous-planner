@@ -161,6 +161,17 @@ Project   → 包含多個 Systems
 
 ---
 
+## 區塊選單觸發點（`components/base/more-trigger.tsx`）
+
+頁面採 Notion 式純文字呈現，各段落旁的 `...` 是 DropdownMenu 觸發點。區塊標題列（會出現「暫無…」的段落）用 `<MoreTrigger>`；列表項目旁的 `...` 仍是 hover 才顯示的原生 span：
+
+- **一般狀態**：hover 所在段落（`group/xxx`）才顯示，透過 `className="opacity-0 group-hover/xxx:opacity-100"` 控制
+- **空狀態**（`pinned`）：`...` 固定顯示，並以虛線外框提示可點擊（hover 時變實線 + 底色）
+- **純文字空狀態**（專案／系統／模型列表）：「暫無任何…」作為 `children` 傳入，以 placeholder（muted）樣式顯示，整段文字連同 `...` 都是觸發範圍
+- **Select 空狀態**（模型 view 的資訊／指示／詢問／種類）：Select 本身已有底線表示可點擊，只需 `pinned` 讓 `...` 固定顯示
+
+---
+
 ## Operation Stereotype
 
 每個 Operation 有 `stereotype: OperationStereotype`（`Command` | `Query`），對應 UML `<<command>>` / `<<query>>`：
