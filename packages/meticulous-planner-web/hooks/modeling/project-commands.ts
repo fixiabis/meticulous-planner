@@ -4,6 +4,20 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useModelingService } from './modeling-service';
 import { projectKey, projectsKey } from './queries';
 
+export function useLoadExample() {
+  const modelingService = useModelingService();
+  const queryClient = useQueryClient();
+
+  const { mutateAsync: loadExample, isPending } = useMutation({
+    mutationFn: () => modelingService.loadExample(),
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+    },
+  });
+
+  return { loadExample, isPending };
+}
+
 export function useAddProject() {
   const modelingService = useModelingService();
   const queryClient = useQueryClient();

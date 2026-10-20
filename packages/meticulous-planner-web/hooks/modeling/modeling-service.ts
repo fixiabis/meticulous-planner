@@ -2,6 +2,7 @@ import { buildBaseModels, buildBaseService } from '@/models/modeling/base';
 import { Attribute } from '@/models/modeling/attribute';
 import { Description } from '@/models/modeling/description';
 import { EnumerationItem } from '@/models/modeling/enumeration-item';
+import { EXAMPLE_ID_PREFIX, buildExampleData } from '@/models/modeling/example';
 import {
   AddModel,
   AddModelAttribute,
@@ -230,6 +231,8 @@ const modelingStorage = {
 // ── Store ──────────────────────────────────────────────────────────────────────
 
 export interface ModelingService {
+  // Example
+  loadExample(): Promise<Project>;
   // Project
   getProjects(query: GetProjects): Promise<Project[]>;
   getProjectSystems(query: GetProjectSystems): Promise<System[]>;
@@ -303,6 +306,18 @@ const useModelingStore = create<ModelingStore>()(
       systems: [],
       services: [],
       models: [],
+
+      async loadExample() {
+        const data = buildExampleData();
+        const notExample = <T extends { id: string }>(item: T) => !item.id.startsWith(EXAMPLE_ID_PREFIX);
+        set({
+          projects: [...get().projects.filter(notExample), ...data.projects],
+          systems: [...get().systems.filter(notExample), ...data.systems],
+          services: [...get().services.filter(notExample), ...data.services],
+          models: [...get().models.filter(notExample), ...data.models],
+        });
+        return data.projects[0];
+      },
 
       async getProjects() {
         return get().projects;
